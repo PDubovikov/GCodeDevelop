@@ -1,0 +1,284 @@
+<Window x:Class="GCD.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
+		
+        xmlns:AVBehav="clr-namespace:GCD.View.Behavior"
+        xmlns:conv="clr-namespace:GCD.Converter"
+        xmlns:pane="clr-namespace:GCD.View.Pane"
+        xmlns:vm="clr-namespace:GCD.ViewModel"
+        xmlns:model="clr-namespace:GCD.Model"
+	
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:sysWindows="clr-namespace:System.Windows;assembly=PresentationCore"
+
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:avalonHighlighting="clr-namespace:ICSharpCode.AvalonEdit.Highlighting"
+        AllowDrop="True"
+		Topmost="{Binding Path=Topmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"        
+        WindowStartupLocation="CenterScreen"
+        AVBehav:DropFileCommand.DropCommand ="{Binding LoadFileCommand}"
+        Title="GCodeDevelop" Height="650" Width="825">
+  <Window.Resources>
+    <conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter"/>
+  	<conv:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Hidden" />
+    <avalonDock:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+  </Window.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <Menu Grid.Row="0">
+      <MenuItem Header="_File">
+        <MenuItem Header="New" Command="{Binding NewCommand}"/>
+        <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+      	<MenuItem Header="Close" Command="{Binding ActiveDocument.CloseCommand}"/>
+        <Separator/>
+        <MenuItem Header="Save" Command="{Binding ActiveDocument.SaveCommand}"/>
+        <MenuItem Header="Save As..." Command="{Binding ActiveDocument.SaveAsCommand}"/>
+        <Separator/>
+        <MenuItem Header="Exit" Command="{Binding ActiveDocument.ExitCommand}"/>
+      </MenuItem>
+      <MenuItem Header="_View">
+        <MenuItem Header="Output" IsChecked="{Binding FileStats.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+      	<MenuItem Header="NXTools" IsChecked="{Binding NXTools.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+      	<MenuItem Header="Topmost" IsChecked="{Binding Topmost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
+    	<MenuItem Header="WordWrap" IsChecked="{Binding ActiveDocument.WordWrap, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsCheckable="True" />
+    	<MenuItem Header="ShowLineNumber" IsChecked="{Binding ActiveDocument.ShowLineNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsCheckable="True" />
+    	<MenuItem Header="ShowEndOfLine" IsChecked="{Binding ActiveDocument.TextOptions.ShowEndOfLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsCheckable="True" />
+    	<MenuItem Header="ShowSpaces" IsChecked="{Binding ActiveDocument.TextOptions.ShowSpaces, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsCheckable="True" />
+    	<MenuItem Header="ShowTabs" IsChecked="{Binding ActiveDocument.TextOptions.ShowTabs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsCheckable="True" />
+      </MenuItem>
+      <MenuItem Header="_Theme" x:Name="listTheme">
+      		<MenuItem Header="Generic" Command="{Binding ChangeThemeCommand}" CommandParameter="Generic" />
+    		<MenuItem Header="Aero" Command="{Binding ChangeThemeCommand}" CommandParameter="Aero" />
+    		<MenuItem Header="Metro" Command="{Binding ChangeThemeCommand}" CommandParameter="Metro" />	
+			<MenuItem Header="VS2010" Command="{Binding ChangeThemeCommand}" CommandParameter="VS2010" />
+    		<MenuItem Header="ExpressionDark" Command="{Binding ChangeThemeCommand}" CommandParameter="ExpressionDark" />
+			<MenuItem Header="ExpressionLight" Command="{Binding ChangeThemeCommand}" CommandParameter="ExpressionLight" />    	
+	  	</MenuItem>
+    </Menu>
+    <!--AnchorablesSource="{Binding Tools}" DocumentsSource="{Binding Files}"-->
+
+      	<ToolBar Grid.Row="1" VerticalAlignment="Stretch" ToolBarTray.IsLocked="True" Width="Auto"
+                  SnapsToDevicePixels="True">
+        <Button Command="{Binding NewCommand}" SnapsToDevicePixels="True" >
+          <Image Source="/GCD;component/Images/App/File_New32.png" Height="24" SnapsToDevicePixels="True" />
+        </Button>
+        <Button Command="{Binding OpenCommand}" SnapsToDevicePixels="True" >
+          <Image Source="/GCD;component/Images/App/File_Open32.png" Height="24" SnapsToDevicePixels="True" />
+        </Button>
+        <Button Command="{Binding ActiveDocument.SaveCommand}" SnapsToDevicePixels="True" >
+          <Image Source="/GCD;component/Images/App/File_Save32.png" Height="24" SnapsToDevicePixels="True" />
+        </Button>
+        <Button Command="Delete" SnapsToDevicePixels="True"
+                ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+          <Image Source="/GCD;component/Images/App/Edit_Delete32.png" Height="24"/>
+        </Button>
+        <Separator Margin="3"/>
+
+        <Button Command="Undo" SnapsToDevicePixels="True"
+              ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+          <Image Source="/GCD;component/Images/App/Edit_Undo32.png" Height="24"/>
+        </Button>
+        <Button Command="Redo" SnapsToDevicePixels="True"
+              ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+          <Image Source="/GCD;component/Images/App/Edit_Redo32.png" Height="24"/>
+        </Button>        	
+  		<Separator/>	
+    	<ComboBox x:Name="ControllerSelector" SelectedItem="{Binding ActiveDocument.HighlightDef, UpdateSourceTrigger=PropertyChanged}"
+    	          IsSynchronizedWithCurrentItem="True"
+				  ItemsSource="{Binding Source={x:Static avalonEdit:Highlighting.HighlightingManager.Instance}, Path=HighlightingDefinitionsSortedByName}"
+				  Visibility="{Binding Path=ActiveDocument, Mode=TwoWay, Converter={conv:ActiveDocumentToVisibilityConverter}}"
+                  MinWidth="150"
+                  Margin="3,0"  >
+         </ComboBox>
+      		
+  		 <Separator Visibility="{Binding Path=ActiveDocument, Mode=TwoWay, Converter={conv:ActiveDocumentToVisibilityConverter}}" />
+      		
+  		 <Button Command="{Binding ActiveDocument.StartProcess}" CommandParameter="{Binding SelectedItem, ElementName=ControllerSelector}" SnapsToDevicePixels="True"
+  		         Visibility="{Binding Path=ActiveDocument, Mode=TwoWay, Converter={conv:ActiveDocumentToVisibilityConverter}}"
+                 ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+                 <Image Source="/GCD;component/Images/App/play_button.png" Height="24"/>
+         </Button>
+		 <Button Command="{Binding ActiveDocument.StepProcess}" SnapsToDevicePixels="True"
+		         Visibility="{Binding Path=ActiveDocument, Mode=TwoWay, Converter={conv:ActiveDocumentToVisibilityConverter}}"
+                 ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+                 <Image Source="/GCD;component/Images/App/step_button.png" Height="24"/>
+         </Button>
+		 <Button Command="{Binding ActiveDocument.StopProcess}" SnapsToDevicePixels="True"
+		         Visibility="{Binding Path=ActiveDocument, Mode=TwoWay, Converter={conv:ActiveDocumentToVisibilityConverter}}"
+                 ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+                 <Image Source="/GCD;component/Images/App/stop_button2.png" Height="24"/>
+         </Button> 	  	
+      </ToolBar>
+  
+      <avalonDock:DockingManager AnchorablesSource="{Binding Tools}" 
+                                 DocumentsSource="{Binding Files}"
+                                 ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+                                 AVBehav:AvalonDockLayoutSerializer.LoadLayoutCommand="{Binding ADLayout.LoadLayoutCommand}"
+                                 AVBehav:AvalonDockLayoutSerializer.SaveLayoutCommand="{Binding ADLayout.SaveLayoutCommand}"
+                                 Grid.Row="2"
+  								 Theme="{Binding CurrentTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >	
+      <avalonDock:DockingManager.DocumentHeaderTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            <!-- Show IsReadOnly Icon in document tab if that properties' present and true -->
+            <Image Source="/GCD;component/Images/App/DocTab/Lock-icon.png"
+                   Margin="3,0,0,0"
+                   VerticalAlignment="Center">
+              <Image.Visibility>
+                <PriorityBinding FallbackValue="Collapsed" >
+                  <Binding Path="Content.IsReadOnly" Mode="OneWay" Converter="{StaticResource BoolToVisibilityConverter}" />
+                </PriorityBinding>
+              </Image.Visibility>
+              <Image.ToolTip>
+                <PriorityBinding FallbackValue="">
+                  <Binding Path="Content.IsReadOnlyReason" Mode="OneWay" />
+                </PriorityBinding>
+              </Image.ToolTip>
+            </Image>
+          </StackPanel>
+        </DataTemplate>
+      </avalonDock:DockingManager.DocumentHeaderTemplate>
+      	
+      <avalonDock:DockingManager.LayoutItemTemplateSelector>
+        <pane:PanesTemplateSelector>
+          <pane:PanesTemplateSelector.FileViewTemplate>
+            <DataTemplate>
+              <avalonEdit:TextEditor Document="{Binding Document, UpdateSourceTrigger=PropertyChanged}"
+                                      SyntaxHighlighting="{Binding HighlightDef, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      IsReadOnly="{Binding IsReadOnly}"
+									  IsModified="{Binding Path=IsDirty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      WordWrap="{Binding Path=WordWrap, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ShowLineNumbers="{Binding Path=ShowLineNumbers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Options="{Binding TextOptions}"
+              						  FontFamily="Courier New" FontSize="{Binding Path=FontSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontWeight="SemiBold"
+              						  AVBehav:MouseBehaviour.MouseWheelCommand="{Binding FontScaleCommand}"
+                                      >
+                <avalonEdit:TextEditor.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Command="Cut" Header="Cut">
+                      <MenuItem.Icon>
+                        <Image Source="/GCD;component/Images/App/Edit_Cut32.png" Height="16"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="Copy" Header="Copy">
+                      <MenuItem.Icon>
+                        <Image Source="/GCD;component/Images/App/Edit_Copy32.png" Height="16"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="Paste" Header="Paste">
+                      <MenuItem.Icon>
+                        <Image Source="/GCD;component/Images/App/Edit_Paste32.png" Height="16"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="Delete" Header="Delete">
+                      <MenuItem.Icon>
+                        <Image Source="/GCD;component/Images/App/Edit_Delete32.png" Height="16"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="Undo" Header="Undo">
+                      <MenuItem.Icon>
+                        <Image Source="/GCD;component/Images/App/Edit_Undo32.png" Height="16"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Command="Redo" Header="Redo">
+                      <MenuItem.Icon>
+                        <Image Source="/GCD;component/Images/App/Edit_Redo32.png" Height="16"/>
+                      </MenuItem.Icon>
+                    </MenuItem>
+                  </ContextMenu>
+                </avalonEdit:TextEditor.ContextMenu>
+              </avalonEdit:TextEditor>
+            </DataTemplate>
+          </pane:PanesTemplateSelector.FileViewTemplate>
+          <pane:PanesTemplateSelector.FileStatsViewTemplate>
+            <DataTemplate>
+                <avalonEdit:TextEditor Document="{Binding ConsoleDocument, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" FontFamily="Courier New" FontSize="14"
+	              					   IsEnabled="{Binding IsDocActive, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"
+            						     />
+            </DataTemplate>
+          </pane:PanesTemplateSelector.FileStatsViewTemplate>
+      	  <pane:PanesTemplateSelector.NXToolsViewTemplate > 
+        	<DataTemplate>
+        		<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<DockPanel >
+					<Button SnapsToDevicePixels="True" VerticalAlignment="Top" Margin="0 2 5 0" 
+					        Visibility="{Binding IsListValue, Converter={StaticResource BoolToHiddenConverter}}"					        
+							Command="{Binding UpdateUFSession}"	>
+						<Image Source="/GCD;component/Images/App/update.png" MaxHeight="24" MaxWidth="24"/>
+					</Button>
+					<Separator />					
+    				<StackPanel>
+                		<ListView ItemsSource="{Binding List, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" BorderBrush="White" >
+                    		<ListView.ItemTemplate>
+                        		<DataTemplate>
+                            		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                		<Image Source="/GCD;component/Images/App/MCS2.png" MaxHeight="20" MaxWidth="20"/>
+                                		<TextBlock VerticalAlignment="Center" Margin="10 0 10 0" FontWeight="SemiBold">            
+                                    	<TextBlock.Text>
+                                            	<Binding Path="Name"/>
+                                    	</TextBlock.Text>
+                                		</TextBlock>
+                        				<ComboBox Margin="5" Height="20" Width="125" VerticalAlignment="Center"
+                            					  ItemsSource="{Binding McsList, Source={x:Static vm:NXToolsViewModel.Instance }, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            					  DisplayMemberPath="Name"
+												  SelectedValue="{Binding McsData, Source={x:Static vm:NXToolsViewModel.Instance }, Mode=OneWayToSource}"
+												  SelectedValuePath="Matrix"                          				          
+                            					  SelectedIndex="{Binding IndexSelected, Source={x:Static vm:NXToolsViewModel.Instance }, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            					  Validation.ErrorTemplate="{x:Null}"
+                            					  />
+                            		</StackPanel>
+                        		</DataTemplate>
+                    		</ListView.ItemTemplate>
+                		</ListView>	
+    				</StackPanel>
+				</DockPanel> 
+				</ScrollViewer>
+      	  	</DataTemplate>
+          </pane:PanesTemplateSelector.NXToolsViewTemplate>
+        </pane:PanesTemplateSelector>
+      </avalonDock:DockingManager.LayoutItemTemplateSelector>
+
+      <avalonDock:DockingManager.LayoutItemContainerStyleSelector>
+        <pane:PanesStyleSelector>
+          <pane:PanesStyleSelector.ToolStyle>
+            <Style TargetType="{x:Type avalonDock:LayoutAnchorableItem}">
+              <Setter Property="Title" Value="{Binding Model.Title}"/>
+              <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
+              <Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
+              <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
+              <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
+              <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
+            </Style>
+          </pane:PanesStyleSelector.ToolStyle>
+          <pane:PanesStyleSelector.FileStyle>
+            <Style TargetType="{x:Type avalonDock:LayoutItem}">
+              <Setter Property="Title" Value="{Binding Model.Title}"/>
+              <Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>
+              <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}"/>
+              <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
+              <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
+            </Style>
+          </pane:PanesStyleSelector.FileStyle>
+        </pane:PanesStyleSelector>
+      </avalonDock:DockingManager.LayoutItemContainerStyleSelector>
+      <avalonDock:DockingManager.LayoutUpdateStrategy>
+        <pane:LayoutInitializer/>
+      </avalonDock:DockingManager.LayoutUpdateStrategy>
+
+      <avalonDock:LayoutRoot>
+        <avalonDock:LayoutPanel Orientation="Vertical">
+          <avalonDock:LayoutDocumentPane/>
+          <avalonDock:LayoutAnchorablePane Name="ToolsPane" DockHeight="150">
+          </avalonDock:LayoutAnchorablePane>
+        </avalonDock:LayoutPanel>
+      </avalonDock:LayoutRoot>
+    </avalonDock:DockingManager>
+  </Grid>
+</Window>

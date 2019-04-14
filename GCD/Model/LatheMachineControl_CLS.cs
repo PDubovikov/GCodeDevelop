@@ -24,7 +24,7 @@ namespace GCD.Model
 				ISet<String> listOffset = new HashSet<String>() ;
 				MachineStatusHelper machine = new MachineStatusHelper();							
 				MotionHelper motion = new MotionHelper();
-				public StringBuilder SCM_CW = new StringBuilder();
+				public StringBuilder SCM_CW { get; set; } = new StringBuilder();
 				private double Tolerance {get ; set ;}
 				private Matrix3D mcsData ;
 				int startIndex, endIndex ;
@@ -34,12 +34,12 @@ namespace GCD.Model
 			
 				}
 		
-				public virtual void startBlock(GCodeParser parser, MachineStatus machineStatus, IDictionary<String, ParsedWord> currentBlock)
+				public void startBlock(GCodeParser parser, MachineStatus machineStatus, IDictionary<String, ParsedWord> currentBlock)
 				{
 						machine.setMachineStatus(machineStatus);
 				}
 				
-				public virtual void endBlock(GCodeParser parser, MachineStatus machineStatus, IDictionary<String, ParsedWord> currentBlock)
+				public void endBlock(GCodeParser parser, MachineStatus machineStatus, IDictionary<String, ParsedWord> currentBlock)
 				{
 					String currentLine = parser.getCurrentLine() ;
 					String MachiningPlane = machine.getActivePlane()  ;
@@ -168,7 +168,7 @@ namespace GCD.Model
 					
 				}
 				
-				public virtual void end(GCodeParser parser, MachineStatus machineStatus)				
+				public void end(GCodeParser parser, MachineStatus machineStatus)				
 				{
 					
 						CoordinatOffsetManager.Instance().AddValue(listOffset) ;

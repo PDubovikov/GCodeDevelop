@@ -13,8 +13,6 @@ using System.Collections.Generic;
 namespace gcodeparser.gcodes
 {
 
-//JAVA TO C# CONVERTER TODO TASK: Enums cannot implement interfaces in .NET:
-//ORIGINAL LINE: public enum MotionMode implements ModalGroups
 	public class MotionMode : ModalGroups
 	{
 

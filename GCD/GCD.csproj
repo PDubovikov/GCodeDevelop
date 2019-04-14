@@ -222,9 +222,7 @@
     <Resource Include="Images\document.png" />
     <Resource Include="Images\property-blue.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Service\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\gcodeparser\gcodeparser.csproj">
       <Project>{a04d3527-40bd-4f61-bb6b-75b1b7e557a9}</Project>

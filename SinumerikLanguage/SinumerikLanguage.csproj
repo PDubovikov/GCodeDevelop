@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1A508EDB-6E99-4642-B69E-009694E66DB8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SinumerikLanguage</RootNamespace>
+    <AssemblyName>SinumerikLanguage</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.7.2.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.2\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Antlr4\EvalExceptions.cs" />
+    <Compile Include="Antlr4\EvalVisitor.cs" />
+    <Compile Include="Antlr4\Function.cs" />
+    <Compile Include="Antlr4\ReturnValue.cs" />
+    <Compile Include="Antlr4\Scope.cs" />
+    <Compile Include="Antlr4\SymbolVisitor.cs" />
+    <Compile Include="Antlr4\SLValue.cs" />
+    <Compile Include="Generate\SinumerikBaseListener.cs" />
+    <Compile Include="Generate\SinumerikBaseVisitor.cs" />
+    <Compile Include="Generate\SinumerikLexer.cs" />
+    <Compile Include="Generate\SinumerikListener.cs" />
+    <Compile Include="Generate\SinumerikParser.cs" />
+    <Compile Include="Generate\SinumerikVisitor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Antlr4 Include="Antlr4\Sinumerik.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>SinumerikLanguage.Antlr4</CustomToolNamespace>
+    </Antlr4>
+    <None Include="App.config" />
+    <None Include="Main\Main.ini" />
+    <None Include="packages.config" />
+    <None Include="Sub\CHAMFER.spf" />
+    <None Include="Sub\KANAVKA_SFERA.spf" />
+    <None Include="Sub\KONUS.spf" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

@@ -1,0 +1,12 @@
+R1=10
+DEF REAL VAR1[R1]
+
+
+FOR R1=0 TO 9
+VAR1[R1]=R1
+ENDFOR
+
+IF VAR1[4] == 4
+G0X=VAR1[4]
+ENDIF
+println("END")

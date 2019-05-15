@@ -20,10 +20,10 @@ namespace gcodeparser.gcodes
 public class ModalGrouping {
 		
 
-    public static ReadOnlyDictionary<GCodeGroups, ISet<string>> groupToModals { get; set; }
-    public static ReadOnlyDictionary<String, GCodeGroups> modalToGroup { get; set; }
+    public static ReadOnlyDictionary<GCodeGroups, ISet<string>> groupToModals;
+    public static ReadOnlyDictionary<String, GCodeGroups> modalToGroup;
     
-    public static Dictionary<string, Double> myDict { get; set; } = new Dictionary<string, Double>();
+    public static Dictionary<string, Double> myDict = new Dictionary<string, Double>() ;
    
 	
     static ModalGrouping() {

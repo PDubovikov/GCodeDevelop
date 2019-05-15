@@ -42,7 +42,9 @@ namespace GCD.Model
         private static Tag oper_tag;
         private NXObject programGroup = null ;
         
-     
+
+        
+        
         private NXSessionInfo()
         {
         	
@@ -177,6 +179,15 @@ namespace GCD.Model
 			}
 			
 		}
+        
+		
+//        internal static NXSessionInfo Instance()
+//        {
+//        	if(_self == null)
+//        		_self = new NXSessionInfo();
+//        	
+//        	return _self ;
+//        }
         		
 	}
 }

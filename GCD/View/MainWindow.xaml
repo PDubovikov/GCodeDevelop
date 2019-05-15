@@ -101,7 +101,8 @@
       		
   		 <Button Command="{Binding ActiveDocument.StartProcess}" CommandParameter="{Binding SelectedItem, ElementName=ControllerSelector}" SnapsToDevicePixels="True"
   		         Visibility="{Binding Path=ActiveDocument, Mode=TwoWay, Converter={conv:ActiveDocumentToVisibilityConverter}}"
-                 ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}">
+                 ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Command.Text}"
+      			 IsEnabled="{Binding Path=ActiveDocument.StartProcessEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                  <Image Source="/GCD;component/Images/App/play_button.png" Height="24"/>
          </Button>
 		 <Button Command="{Binding ActiveDocument.StepProcess}" SnapsToDevicePixels="True"

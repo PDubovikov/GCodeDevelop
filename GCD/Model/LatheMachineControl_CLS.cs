@@ -17,7 +17,7 @@ namespace GCD.Model
 	/// <summary>
 	/// Description of LatheMachineControl_CLS.
 	/// </summary>
-	public class LatheMachineControl_CLS : MachineController
+	public class LatheMachineControl_CLS : IMachineController
 	{
 		
 				private static LatheMachineControl_CLS self ;

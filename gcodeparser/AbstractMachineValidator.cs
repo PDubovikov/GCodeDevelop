@@ -17,11 +17,22 @@ namespace gcodeparser
 	public abstract class AbstractMachineValidator
 	{
 
+
+//JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+//ORIGINAL LINE: public abstract void preVerify(java.util.Map<String, ParsedWord> block) throws com.rvantwisk.gcodeparser.exceptions.SimException;
 		public abstract void preVerify(IDictionary<string, ParsedWord> block);
 
+//JAVA TO C# CONVERTER WARNING: Method 'throws' clauses are not available in .NET:
+//ORIGINAL LINE: public abstract void postVerify(MachineStatus machineStatus) throws com.rvantwisk.gcodeparser.exceptions.SimException;
 		public abstract void postVerify(MachineStatus machineStatus);
 
-
+		/// <summary>
+		/// Helper to find multiple words in teh same block
+		/// </summary>
+		/// <param name="block"> </param>
+		/// <param name="enumClass"> </param>
+		/// @param <T>
+		/// @return </param>
 		protected internal virtual bool hasMultipleWords<T>(IDictionary<string, ParsedWord> block, Type enumClass) where T : IEnumerable<T>
 		{
 			return wordCount<int>(block, enumClass) > 1;
@@ -56,7 +67,8 @@ namespace gcodeparser
 		/// <param name="block"> </param>
 		/// <param name="hasAnyOfThis">
 		/// @return </param>
-
+//JAVA TO C# CONVERTER WARNING: 'final' parameters are not available in .NET:
+//ORIGINAL LINE: protected boolean hasAny(java.util.Map<String, Object> block, final String[] hasAnyOfThis)
 		protected internal virtual bool hasAny(IDictionary<string, object> block, string[] hasAnyOfThis)
 		{
 			foreach (String item in hasAnyOfThis)
@@ -74,7 +86,8 @@ namespace gcodeparser
 		/// <param name="block"> </param>
 		/// <param name="hasAnyOfThis">
 		/// @return </param>
-
+//JAVA TO C# CONVERTER WARNING: 'final' parameters are not available in .NET:
+//ORIGINAL LINE: protected boolean hasAny(java.util.Set<String> block, final String[] hasAnyOfThis)
 		protected internal virtual bool hasAny(ISet<string> block, string[] hasAnyOfThis)
 		{
 			foreach (String item in hasAnyOfThis)

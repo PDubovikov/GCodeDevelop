@@ -72,6 +72,9 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.7.2.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr4.Runtime.Standard.4.7.2\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
     <Reference Include="NXOpen, Version=11.0.0.33, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Crayfish.NXOpen.110.11.0.0.37\lib\net45\NXOpen.dll</HintPath>
     </Reference>
@@ -118,7 +121,8 @@
     <Compile Include="Converter\ActiveDocumentConverter.cs" />
     <Compile Include="Converter\ActiveDocumentToVisibilityConverter.cs" />
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
-    <Compile Include="Model\LatheMachineControl_CLS.cs" />
+    <Compile Include="Model\MayakLatheControl_CLS.cs" />
+    <Compile Include="Model\SinumerikLatheControl_CLS.cs" />
     <Compile Include="Model\MachineControl_CLS.cs" />
     <Compile Include="Model\CoordinatOffsetInfo.cs" />
     <Compile Include="Model\CoordinatOffsetManager.cs" />
@@ -186,6 +190,16 @@
     <Resource Include="Images\App\update2.png" />
     <Resource Include="Images\App\update3.png" />
     <Resource Include="Images\App\update4.png" />
+    <None Include="AvalonEdit\Highlighting\01_XML-Mode.xshd" />
+    <None Include="AvalonEdit\Highlighting\Log.xshd" />
+    <None Include="AvalonEdit\Highlighting\Mayak600T.xshd" />
+    <None Include="AvalonEdit\Highlighting\Okuma_Mill.xshd" />
+    <None Include="AvalonEdit\Highlighting\Sinumerik520K.xshd" />
+    <None Include="AvalonEdit\Highlighting\Sinumerik840D_Mill.xshd" />
+    <None Include="AvalonEdit\Highlighting\Sinumerik840D_Mill_Adv.xshd" />
+    <None Include="AvalonEdit\Highlighting\Sinumerik840D_Turn.xshd" />
+    <None Include="AvalonEdit\Highlighting\Sinumerik840D_Turn_Adv.xshd" />
+    <None Include="AvalonEdit\Highlighting\TXT.xshd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -222,15 +236,21 @@
     <Resource Include="Images\document.png" />
     <Resource Include="Images\property-blue.png" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\gcodeparser\gcodeparser.csproj">
-      <Project>{a04d3527-40bd-4f61-bb6b-75b1b7e557a9}</Project>
-      <Name>gcodeparser</Name>
+    <Folder Include="Service\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Users\Petr\source\repos\SinumerikLanguage\SinumerikLanguage\SinumerikLanguage.csproj">
+      <Project>{1a508edb-6e99-4642-b69e-009694e66db8}</Project>
+      <Name>SinumerikLanguage</Name>
     </ProjectReference>
     <ProjectReference Include="..\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj">
-      <Project>{6c55b776-26d4-4db3-a6ab-87e783b2f3d1}</Project>
+      <Project>{6C55B776-26D4-4DB3-A6AB-87E783B2F3D1}</Project>
       <Name>ICSharpCode.AvalonEdit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gcodeparser\gcodeparser.csproj">
+      <Project>{A04D3527-40BD-4F61-BB6B-75B1B7E557A9}</Project>
+      <Name>gcodeparser</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

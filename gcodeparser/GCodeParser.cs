@@ -13,7 +13,7 @@ namespace gcodeparser
 //		private static string SEPARATOR = System.getProperty("line.separator");
 		private readonly MachineStatus machineStatus = new MachineStatus(); // kept's track of machine status after end of block
 		private readonly MachineStatus intermediateStatus = new MachineStatus(); // Keeps tracking of machine status during block processing
-		private readonly MachineController[] machineController; // A machine controller to send parsed block's + machine status into
+		private readonly IMachineController[] machineController; // A machine controller to send parsed block's + machine status into
 		private readonly AbstractMachineValidator machineValidator; // A machine controller to send parsed block's + machine status into
 //		private readonly Regex GCODEPATTERN = new Regex("([GXYZABCDFHIJKLMNPQRSTUVW]o?)\\s*([0-9.+-]+)?(\\s*/?\\s*)([0-9.+-]+)?", RegexOptions.Compiled);
 		private static readonly string gcodepattern = @"([aA-zZ]{1,7})=?([AI][C])?\(?([-+]?\d*\.?\d*)?\)?";
@@ -27,18 +27,25 @@ namespace gcodeparser
 //		private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
 		private string currentLine = ""; // Hold's the current line between begin and endblock calls
 		private int currentLineNumber = 1;
+		private string _machineType;
+		public string MachineType 
+		{ 
+			get{return _machineType ;}
+			set{_machineType = value ;}
+		}
 
-
-		public GCodeParser(AbstractMachineValidator machineValidator, StringBuilder input, params MachineController[] machineController)
+		
+		public GCodeParser(AbstractMachineValidator machineValidator, StringBuilder input, String machineType, params IMachineController[] machineController)
 		{
 			foreach (object c in machineController)
 			{
-				if (!(c is MachineController))
+				if (!(c is IMachineController))
 				{
 					throw new System.ArgumentException("StatisticLimitsController only accepts type's of MachineController");
 				}
 			}
-
+			
+			_machineType = machineType ;
 			this.machineController = machineController;
 			this.machineValidator = machineValidator;
 			
@@ -51,7 +58,7 @@ namespace gcodeparser
 					parseLine();
 				
 			}
-			foreach (MachineController controller in this.machineController)
+			foreach (IMachineController controller in this.machineController)
 			{
 				controller.end(this, intermediateStatus);
 			}
@@ -70,13 +77,13 @@ namespace gcodeparser
 				{
 //					currentLine.Replace(g4.Value, "") ;						
 				}
-				if (comment1.Success)
+				if (comment1.Success && (MachineType == "Fanuc" || MachineType == "Okuma" || MachineType == "Mayak"))
 				{
-			//		parsedLine.Remove(comment1.Index, comment1.Length) ; // for Fanuc, Okuma, Haas
+					parsedLine.Remove(comment1.Index, comment1.Length) ; // for Fanuc, Okuma, Haas
 				}
 				if(comment2.Success)
 				{
-					parsedLine.Remove(comment2.Index, comment2.Length) ;
+					parsedLine.Remove(comment2.Index, comment2.Length) ; // for Sinumerik
 				}
 				
 			ISet<string> wordcmd = new HashSet<string>();
@@ -178,7 +185,7 @@ namespace gcodeparser
 			// Copy to intermediate status to ensure our machine status is always valid
 			intermediateStatus.copyFrom(machineStatus);
 			// Notify the controller that we are about to start a new block, the block itself is valid, for example there we be no G1's and G0 on one line
-			foreach (MachineController controller in this.machineController)
+			foreach (IMachineController controller in this.machineController)
 			{
 				controller.startBlock(this, intermediateStatus, block);
 			}
@@ -199,7 +206,7 @@ namespace gcodeparser
 			}
 
 			// Notify the controller that everything was ok, now teh controller start 'running' the data
-			foreach (MachineController controller in this.machineController)
+			foreach (IMachineController controller in this.machineController)
 			{
 				controller.endBlock(this, intermediateStatus, block);
 			}

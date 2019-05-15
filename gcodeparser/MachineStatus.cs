@@ -256,7 +256,7 @@ namespace gcodeparser
 							if (word.cmode.Contains("IC") || modals.Contains("G91"))
 							{
 								if(modalsCmd.Contains("DIAMON") )
-									Value.X = (Value.X + word.value)*0.5 ;
+									Value.X = Value.X + word.value*0.5 ;
 								else
 									Value.X = Value.X + word.value ;
 							}

@@ -33,15 +33,10 @@ namespace GCD.Model
 		private Matrix3D mcsData ;
 		private Tag partTag, programGroupTag, setupTag, currentProg, currentMcs, geomGroupTag, methodGroupTag, templateOperTag ;
 		private Tag[] listProgTag, listOperTag, listGeomTag, listMethodTag ;
-		private Matrix3D _mcsDataInfo ;
-		private IntPtr templateObject ;
 		private string _configFile ;
 		private string programName ;
-		private string mcsName, subMcsName ;
 		private string operName ;
-		private string objectName ;
-		private int _countProg, _countOper, _countGeom, _countSubGeom ;
-		private bool generate ;
+		private int _countProg,  _countGeom;
 		
 		
 		private NXSessionManager()

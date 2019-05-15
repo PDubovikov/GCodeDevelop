@@ -17,6 +17,9 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Utils;
 using ICSharpCode.AvalonEdit.Highlighting;
 using GCD.Model;
+using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
+using SinumerikLanguage.Antlr4;
 using gcodeparser ;
 
 
@@ -350,7 +353,7 @@ namespace GCD.ViewModel
     			this.RaisePropertyChanged("FontSize") ;
     	}
     }
-    
+        
     #region SaveCommand
     RelayCommand _saveCommand = null;
     public ICommand SaveCommand
@@ -467,6 +470,17 @@ namespace GCD.ViewModel
     	}
     }
     
+    private bool strProcessEnabled = true;
+    public bool StartProcessEnabled
+    {
+    	get {return strProcessEnabled ; }
+    	set
+    	{
+    		this.strProcessEnabled = value;
+    		this.RaisePropertyChanged("StartProcessEnabled") ;
+    	}
+    }
+    
     RelayCommand _startProcess = null;
     public ICommand StartProcess
     {
@@ -474,16 +488,30 @@ namespace GCD.ViewModel
       {
         if (_startProcess == null)
         {
-        	_startProcess = new RelayCommand((p) => Processing(p), (p) => true);
+        	_startProcess = new RelayCommand((p) => Processing(p), (p) => strProcessEnabled);
         }
 
         return _startProcess;
       }
     }
     
+    RelayCommand _stopProcess = null;
+    public ICommand StopProcess
+    {
+    	get
+    	{
+    		if(_stopProcess == null)
+    		{
+    			_stopProcess = new RelayCommand((p) => ProcessingStop(p), (p) => true);
+    		}
+    		
+    		return _stopProcess;
+    	}
+    }
+    
 	async void Processing(object param)
 	{
-			//prog_process.IsEnabled = false ; 
+			strProcessEnabled = false ; 
 			System.Threading.CancellationToken cancellationToken ;
 			cts = new CancellationTokenSource() ;
 			cancellationToken = cts.Token ;
@@ -530,6 +558,46 @@ namespace GCD.ViewModel
 					}
 					break;
 				}
+				case "Sinumerik 840D_Mill_Adv":
+				{
+					string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Mill_Adv.cls" ;	
+					try 
+					{
+						await sin840_calculate_mill_adv(cancellationToken);							
+						if(File.Exists(_fullPath))
+						{
+							Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(_fullPath)) ;
+							Workspace.This.FileStats.IsDocActive = true ;
+						}
+					}
+					catch(Exception ex)
+					{
+						cts.Cancel();
+						MessageBox.Show(ex.Message) ;
+					}
+					break;
+				}	
+				case "Sinumerik 840D_Turn_Adv":
+				{
+					string __fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Turn.cls" ;	
+					try 
+					{
+							await sin840_calculate_turn_adv(cancellationToken);
+							
+							if(File.Exists(__fullPath))
+							{
+								Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(__fullPath)) ;
+								Workspace.This.FileStats.IsDocActive = true ;
+							}
+					}
+					catch(Exception ex)
+					{
+						cts.Cancel();
+						MessageBox.Show(ex.Message) ;
+					}
+					break;
+				}
+					
 				case "Sinumerik 520K":
 				{
 		//			await sin520_calculate();
@@ -537,13 +605,59 @@ namespace GCD.ViewModel
 				}
 				case "Mayak 600T":
 				{
-		//			await mayak600_calculate();
+					string __fullPath = FileDirectoryName + FileNameExceptExtension + "_M600_Turn.cls" ;	
+					try 
+					{
+							await mayak600_calculate_turn(cancellationToken);
+							
+							if(File.Exists(__fullPath))
+							{
+								Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(__fullPath)) ;
+								Workspace.This.FileStats.IsDocActive = true ;
+							}
+					}
+					catch(Exception ex)
+					{
+						cts.Cancel();
+						MessageBox.Show(ex.Message) ;
+					}
+					break;
+				}
+				case "Okuma Mill":
+				{
+					string _fullPath = FileDirectoryName + FileNameExceptExtension + "_Okuma_Mill.cls" ;	
+					try 
+					{
+						await okuma_calculate_mill(cancellationToken);							
+						if(File.Exists(_fullPath))
+						{
+							Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(_fullPath)) ;
+							Workspace.This.FileStats.IsDocActive = true ;
+						}
+					}
+					catch(Exception ex)
+					{
+						cts.Cancel();
+						MessageBox.Show(ex.Message) ;
+					}					
+											
 					break;
 				}
 					
 			}
 				
-			//prog_process.IsEnabled = true ;				
+			strProcessEnabled = true ;				
+	}
+	
+	
+	void ProcessingStop(object param)
+	{
+		
+		if(cts != null)
+		{
+			cts.Cancel();
+
+		}
 	}
 	
 	private TextDocument _consoleText = null ;
@@ -574,16 +688,50 @@ namespace GCD.ViewModel
 			StringBuilder paramprog = new StringBuilder() ;
 			return Task.Run(() => {			    			
 				MachineControl_CLS mcontrolCLS = new MachineControl_CLS();
-				GCodeParser parser = new GCodeParser(null, strb1, mcontrolCLS);
+				GCodeParser parser = new GCodeParser(null, strb1, "Sinumerik", mcontrolCLS);
 				
 				File.WriteAllText(_fullPath, mcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
 
 				
-				NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, false) ;
-			//	ConsoleText = new TextDocument(mcontrolCLS.SCM_CW.ToString() ) ;
-			//	Workspace.This.FileStats.ConsoleDocument = new TextDocument(mcontrolCLS.SCM_CW.ToString()) ;
-			//	StringBuffer = mcontrolCLS.SCM_CW  ;	
+				NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, false) ;	
 				
+			}, cancellationToken
+			);
+			
+	}
+	
+	Task sin840_calculate_mill_adv(System.Threading.CancellationToken cancellationToken)
+	{
+			string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Mill_Adv.cls" ;
+			string _fileNameAddPrefix = FileNameExceptExtension + "_S840D_Mill_Adv" ;
+			SinumerikLexer lexer = new SinumerikLexer(CharStreams.fromstring(Document.Text));
+
+		//	File.WriteAllText("Program_S840_Text.txt", strb1.ToString()) ;
+			StringBuilder gcodeOutput = new StringBuilder() ;
+			return Task.Run(() => {
+			    	
+					SinumerikParser sinuParser = new SinumerikParser(new CommonTokenStream(lexer));
+					sinuParser.BuildParseTree = true;
+                	IParseTree tree = sinuParser.parse();
+					
+                	Scope scope = new Scope();
+                	var functions = new Dictionary<string, Function>();
+                	SymbolVisitor symbolVisitor = new SymbolVisitor(functions);
+                	symbolVisitor.Visit(tree);
+                	EvalVisitor visitor = new EvalVisitor(scope, functions, gcodeOutput);
+					visitor.Visit(tree);
+					
+					cancellationToken.ThrowIfCancellationRequested();
+             //   	gcodeOutput.Append(visitor.GcodeBuffer);
+					MachineControl_CLS mcontrolCLS = new MachineControl_CLS();
+					GCodeParser parser = new GCodeParser(null, gcodeOutput, "Sinumerik", mcontrolCLS);
+					
+					File.WriteAllText(_fullPath, mcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
+
+					NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, false) ;
+					
+					
+				 	
 			}, cancellationToken
 			);
 			
@@ -597,8 +745,8 @@ namespace GCD.ViewModel
 			
 			StringBuilder paramprog = new StringBuilder();
 			return Task.Run(() => {			    	
-				LatheMachineControl_CLS lmcontrolCLS = new LatheMachineControl_CLS();
-				GCodeParser parser = new GCodeParser(null, strb1, lmcontrolCLS);
+				SinumerikLatheControl_CLS lmcontrolCLS = new SinumerikLatheControl_CLS();
+				GCodeParser parser = new GCodeParser(null, strb1, "Sinumerik", lmcontrolCLS);
 				
 				File.WriteAllText(_fullPath, lmcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
 				
@@ -610,22 +758,83 @@ namespace GCD.ViewModel
 			                
 	}
 	
-	public TextDocument GetResult()
+	Task sin840_calculate_turn_adv(System.Threading.CancellationToken cancellationToken)
 	{
-						Task<StringBuilder> program = new Task<StringBuilder>( () =>
-	                                                      {
-	                                                      		StringBuilder sbild = new StringBuilder(Document.Text) ;
-	                                                      		MachineControl_CLS mctrl = new MachineControl_CLS();
-	                                                      		GCodeParser pars = new GCodeParser(null, sbild, mctrl) ;
-	                                                      	
-	                                                      		return mctrl.SCM_CW ;
-	                                                      });
-															program.Start();
-															MessageBox.Show(program.Result.ToString()) ;
-															ConsoleText = new TextDocument(program.Result.ToString()) ;
-															return ConsoleText ;
+			StringBuilder gcodeOutput = new StringBuilder() ;
+			string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Turn.cls" ;
+			string _fileNameAddPrefix = FileNameExceptExtension + "_S840D_Turn" ;
+			SinumerikLexer lexer = new SinumerikLexer(CharStreams.fromstring(Document.Text));
+			
+			StringBuilder paramprog = new StringBuilder();
+			return Task.Run(() => {
+
+				SinumerikParser sinuParser = new SinumerikParser(new CommonTokenStream(lexer));
+				sinuParser.BuildParseTree = true;
+                IParseTree tree = sinuParser.parse();
+				
+                Scope scope = new Scope();
+                var functions = new Dictionary<string, Function>();
+                SymbolVisitor symbolVisitor = new SymbolVisitor(functions);
+                symbolVisitor.Visit(tree);
+                EvalVisitor visitor = new EvalVisitor(scope, functions, gcodeOutput);
+				visitor.Visit(tree);
+
+                cancellationToken.ThrowIfCancellationRequested();
+                
+				SinumerikLatheControl_CLS lmcontrolCLS = new SinumerikLatheControl_CLS();
+				GCodeParser parser = new GCodeParser(null, gcodeOutput, "Sinumerik", lmcontrolCLS);
+				
+				File.WriteAllText(_fullPath, lmcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
+				
+				NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, true) ;
+			//	StringBuffer = mcontrolCLS.SCM_CW ;
+				
+			}, cancellationToken
+			);
+			                
 	}
-		
-    
+	Task mayak600_calculate_turn(System.Threading.CancellationToken cancellationToken)
+	{
+			StringBuilder strb1 = new StringBuilder(Document.Text) ;
+			string _fullPath = FileDirectoryName + FileNameExceptExtension + "_M600_Turn.cls" ;
+			string _fileNameAddPrefix = FileNameExceptExtension + "_M600_Turn" ;
+			
+			StringBuilder paramprog = new StringBuilder();
+			return Task.Run(() => {			    	
+				MayakLatheControl_CLS lmcontrolCLS = new MayakLatheControl_CLS();
+				GCodeParser parser = new GCodeParser(null, strb1, "Mayak", lmcontrolCLS);
+				
+				File.WriteAllText(_fullPath, lmcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
+				
+				NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, true) ;
+			//	StringBuffer = mcontrolCLS.SCM_CW ;
+				
+			}, cancellationToken
+			);
+			                
+	}
+	
+	Task okuma_calculate_mill(System.Threading.CancellationToken cancellationToken)
+	{
+			StringBuilder strb1 = new StringBuilder(Document.Text) ;
+			string _fullPath = FileDirectoryName + FileNameExceptExtension + "_Okuma_Mill.cls" ;
+			string _fileNameAddPrefix = FileNameExceptExtension + "_Okuma_Mill" ;
+			
+		//	File.WriteAllText("Program_S840_Text.txt", strb1.ToString()) ;
+			StringBuilder paramprog = new StringBuilder() ;
+			return Task.Run(() => {			    			
+				MachineControl_CLS mcontrolCLS = new MachineControl_CLS();
+				GCodeParser parser = new GCodeParser(null, strb1, "Okuma" ,mcontrolCLS);
+				
+				File.WriteAllText(_fullPath, mcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
+
+				
+				NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, false) ;
+				
+			}, cancellationToken
+			);
+			
+	}
+		    
   }
 }

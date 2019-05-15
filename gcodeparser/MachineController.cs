@@ -14,13 +14,15 @@ using gcodeparser;
 namespace gcodeparser
 {
 
-	public interface MachineController
+	public interface IMachineController
 	{
 
 		void startBlock(GCodeParser parser, MachineStatus machineStatus, IDictionary<string, ParsedWord> block);
 
+		
 		void endBlock(GCodeParser parser, MachineStatus machineStatus, IDictionary<string, ParsedWord> block);
 
+		
 		void end(GCodeParser parser, MachineStatus machineStatus);
 
 	}

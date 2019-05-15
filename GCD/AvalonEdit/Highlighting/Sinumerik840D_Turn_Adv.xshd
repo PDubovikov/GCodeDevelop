@@ -1,0 +1,153 @@
+﻿<?xml version="1.0"?>
+<SyntaxDefinition name="Sinumerik 840D_Turn_Adv" extensions=".mpf" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+	<Color name="Comment" foreground="Green" />
+	<Color name="G01" foreground="Blue" />
+	<Color name="G00" foreground="Red" />
+	<Color name="G02" foreground="DarkBlue" />
+	<Color name="Speed" foreground="Purple" />
+	<Color name="Feed" foreground="Black" />
+	<Color name="Tool" foreground="Black" />
+	<Color name="Mfunc" foreground="Purple" />
+	<!-- This is the main ruleset. -->
+	<!--   -->
+	<RuleSet ignoreCase="false">
+		<Span color="Comment" begin="\;" />
+		<Span color="G01" multiline="true" begin="(?=([A-Z]?[\s]*[0-9]*[\s]*[G][0][1]))" end="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][0])|([A-Z]?[\s]*[0-9]*[\s]*[gG][0][2])|([A-Z]?[\s]*[0-9]*[\s]*[gG][0][3]))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					 <!--ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${}--> 
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+
+		<Span color="G00" multiline="true" begin="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][0]))" end="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][1])|([A-Z]?[\s]*[0-9]*[\s]*[gG][0][2])|([A-Z]?[\s]*[0-9]*[\s]*[gG][0][3]))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					<!-- ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${} -->
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+
+		<Span color="G01" multiline="true" begin="(?=([A-Z]*[\s]*[0-9]*[\s]*([G][0-9][0-9])*[\s]*[G][1][\s]*([G][0-9][0-9])*[\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))" end="(?=([A-Z]*[\s]*[0-9]*[\s]*[gG][0][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+)|([A-Z]*[\s]*[0-9]*[\s]*[gG][2][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+)|([A-Z]*[\s]*[0-9]*[\s]*[gG][3][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					 <!--ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${}--> 
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+
+		<Span color="G00" multiline="true" begin="(?=([A-Z]*[\s]*[0-9]*[\s]*([G][0-9][0-9])*[\s]*[gG][0][\s]*([G][0-9][0-9])*[\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))" end="(?=([A-Z]*[\s]*[0-9]*[\s]*[gG][1][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+)|([A-Z]*[\s]*[0-9]*[\s]*[gG][2][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+)|([A-Z]*[\s]*[0-9]*[\s]*[gG][3][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					<!-- ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${} -->
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+		
+		<Span color="G02" multiline="true" begin="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][2]))" end="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][1])|([A-Z]?[\s]*[0-9]*[\s]*[gG][0][0]))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					<!-- ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${} -->
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+		<Span color="G02" multiline="true" begin="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][3]))" end="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][1])|([A-Z]?[\s]*[0-9]*[\s]*[gG][0][0]))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					<!-- ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${} -->
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+		<Span color="G02" multiline="true" begin="(?=([A-Z]*[\s]*[0-9]*[\s]*[gG][2][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))" end="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+)|([A-Z]?[\s]*[0-9]*[\s]*[gG][1][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					<!-- ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${} -->
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+		<Span color="G02" multiline="true" begin="(?=([A-Z]*[\s]*[0-9]*[\s]*[gG][3][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))" end="(?=([A-Z]?[\s]*[0-9]*[\s]*[gG][0][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+)|([A-Z]?[\s]*[0-9]*[\s]*[gG][1][\s]*[ABCDFHIJKLMNOPQRSTUVWXYZ]+))">
+			<RuleSet>
+				<Span begin="\\" end="." />
+				<Span foreground="Green" ruleSet="">
+					<!-- ruleSet="" reference this file's main ruleset, allowing normal boo code inside ${} -->
+					<Begin>\;</Begin>
+					<End>\\n</End>
+				</Span>
+				<Rule color="Speed">([sS][\s+]?[0-9]+)</Rule>
+				<Rule color="Mfunc">([mM][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([tT][\s+]?[0-9]+)</Rule>
+				<Rule color="Tool">([dD][\s+]?[0-9]+)</Rule>
+				<Rule color="Feed">([fF][\s+]?\d+(\.[0-9]+)?)</Rule>
+			</RuleSet>
+		</Span>
+		<!--		<Span color="G01" multiline="true" begin="(?=([gG][0][1]))" end="(?=([gG][0][0]))">
+		</Span>
+		<Span color="G00" multiline="true" begin="(?=([gG][0][0]))" end="(?=([gG][0][1]))" >
+		</Span>-->
+		<!-- Digits -->
+		<!--		<Rule foreground="Orange">
+            \b0[xX][0-9a-fA-F]+  # hex number
+        |    \b
+            (    \d+(\.[0-9]+)?   #number with optional floating point
+            |    \.[0-9]+         #or just starting with floating point
+            )
+            ([eE][+-]?[0-9]+)? # optional exponent
+        </Rule>-->
+	</RuleSet>
+</SyntaxDefinition>

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 namespace gcodeparser.gcodes
 {
 
+
 	public class MotionMode : ModalGroups
 	{
 

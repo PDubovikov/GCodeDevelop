@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GCD", "GCD\GCD.csproj", "{9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICSharpCode.AvalonEdit", "ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj", "{6C55B776-26D4-4DB3-A6AB-87E783B2F3D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SinumerikLanguage", "..\..\..\Users\Petr\source\repos\SinumerikLanguage\SinumerikLanguage\SinumerikLanguage.csproj", "{1A508EDB-6E99-4642-B69E-009694E66DB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SinumerikLanguage", "SinumerikLanguage\SinumerikLanguage.csproj", "{1A508EDB-6E99-4642-B69E-009694E66DB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,73 @@
+;**********************************************************************
+;**********************************************************************
+;******************                                 *******************
+;**************            CYCLE NA KONUSA             ****************
+;******************                                 *******************
+;**********************************************************************
+;**********************************************************************
+;******************                                 *******************
+;***************    NICHEGO TUT NE TROGAT'!!!!!        ****************
+;********   ZALEZESH V ETU PROGRAMMU =>> RUKI OTORVU!!!   *************
+;***************                                    *******************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+;**********************************************************************
+N10 PROC CYCLE_KONUS(REAL OTVOD, REAL NACHALNII_RADIUS, REAL UGOL_DELENIYA, REAL SHAG, REAL NAKLON_KONUSA, REAL KONECHN_RADIUS, REAL RADIUS_FREZI, REAL RADIUS_PLASTIN, REAL NACHALNAYA_GLUBINA, REAL CPA, REAL CPO) DISPLOF
+N20 DEF REAL SCETCHIK_1
+N30 DEF REAL SHAG_PO_Z
+N40 DEF REAL SHETCIK_2
+N50 DEF REAL SHETCIK_3
+N60 DEF REAL SHETCIK_4
+N70 DEF REAL SHETCIK_5
+N80 DEF REAL SHETCIK_6
+N90 DEF REAL SHETCIK_X
+N100 DEF REAL SHETCIK_Y
+N110 DEF REAL SHETCIK_Z
+N120 DEF REAL USLOVIE
+N130 DEF REAL MESSEG
+N140 SCETCHIK_1=0
+N150 SHAG_PO_Z=SHAG*COS(NAKLON_KONUSA)
+N160 SHETCIK_2=SHAG_PO_Z*TAN(NAKLON_KONUSA)
+N170 SHETCIK_3=0
+N180 SHETCIK_4=0
+N190 SHETCIK_5=0
+N200 NACHALNII_RADIUS=NACHALNII_RADIUS-RADIUS_FREZI
+N210 KONECHN_RADIUS=KONECHN_RADIUS-RADIUS_FREZI
+N220 SHETCIK_6=(KONECHN_RADIUS*360/SHAG_PO_Z)
+N230 G641
+N240 G0 Z=OTVOD
+N250 G0 X=CPA Y=CPO
+N260 G0 Z=NACHALNAYA_GLUBINA+2
+N270 SBLOF
+N280 METKA1:
+N290 SCETCHIK_1=SCETCHIK_1+UGOL_DELENIYA
+N300 SHETCIK_3=(NACHALNII_RADIUS-SHETCIK_2*SCETCHIK_1/360)*SIN(SCETCHIK_1)
+N310 SHETCIK_4=(NACHALNII_RADIUS-SHETCIK_2*SCETCHIK_1/360)*COS(SCETCHIK_1) 
+N320 SHETCIK_5=SHAG_PO_Z*SCETCHIK_1/360
+N330 SHETCIK_Y=SHETCIK_3+RADIUS_PLASTIN*(1-COS(NAKLON_KONUSA))*SIN(SCETCHIK_1)
+N340 SHETCIK_X=SHETCIK_4+RADIUS_PLASTIN*(1-COS(NAKLON_KONUSA))*COS(SCETCHIK_1) 
+N350 SHETCIK_Z=SHETCIK_5+RADIUS_PLASTIN*(1-SIN(NAKLON_KONUSA))
+N360 G1 X=SHETCIK_X+CPA Y=SHETCIK_Y+CPO Z=-SHETCIK_Z+NACHALNAYA_GLUBINA
+N370 USLOVIE=SQRT(SHETCIK_3*SHETCIK_3+SHETCIK_4*SHETCIK_4)
+N380 MESSEG=-(TRUNC((KONECHN_RADIUS-USLOVIE)*TAN(90-NAKLON_KONUSA)))
+N390 IF MESSEG<=0
+N400 MESSEG=-((KONECHN_RADIUS-USLOVIE)*TAN(90-NAKLON_KONUSA))
+N410 ELSE
+N420 MESSEG=-(TRUNC((KONECHN_RADIUS-USLOVIE)*TAN(90-NAKLON_KONUSA)))
+N430 ENDIF
+N440 ;MSG ("OSTATOK PO Z: "<<MESSEG<<" MM")
+N450 IF USLOVIE<=KONECHN_RADIUS GOTOF METKA2
+N460 GOTOB METKA1
+N470 METKA2:
+N480 MSG ("KONUS OK?")
+N490 SBLON
+N500 G1 X=CPA Y=CPO
+N510 G0 Z=OTVOD
+N520 MSG (" ")
+N530 RET

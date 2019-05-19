@@ -434,7 +434,7 @@ namespace SinumerikLanguage.Antlr4
             {
                 throw new EvalException(ctx);
             }
-
+           
             return new SLValue(Math.IEEERemainder(lhs.asDouble(), rhs.asDouble()));
         }
 
@@ -558,7 +558,7 @@ namespace SinumerikLanguage.Antlr4
         public override SLValue VisitStringExpression(StringExpressionContext ctx)
         {
             String text = ctx.GetText();
-            text = text.Substring(1, text.Length - 1).Replace("\\\\(.)", "$1");
+            text = text.Substring(1, text.Length - 2);
             SLValue val = new SLValue(text);
             if (ctx.indexes() != null)
             {
@@ -628,6 +628,27 @@ namespace SinumerikLanguage.Antlr4
             return SLValue.VOID;
         }
 
+        //vardefinition
+        //Def typeDef varlist indexes? '='? expression?
+        public override SLValue VisitVardefinition(VardefinitionContext ctx)
+        {
+            SLValue newVal = null;
+            //List<ExpressionContext> values = ctx.varlist().expression().ToList();
+
+            foreach (var item in ctx.varlist())
+            {
+                if(item.expression() != null)
+                    newVal = this.Visit(item.expression());
+
+                scope.assign(item.Identifier().GetText(), newVal);
+                newVal = null; 
+            }
+            
+
+            return SLValue.VOID;
+        }
+
+
         // Identifier '(' exprList? ')' #identifierFunctionCall
         public override SLValue VisitIdentifierFunctionCall(IdentifierFunctionCallContext ctx)
         {
@@ -645,31 +666,6 @@ namespace SinumerikLanguage.Antlr4
         public override SLValue VisitPrintlnFunctionCall(PrintlnFunctionCallContext ctx)
         {
             Console.WriteLine(this.Visit(ctx.expression()));
-            return SLValue.VOID;
-        }
-
-        // Print '(' expression ')'     #printFunctionCall
-        public override SLValue VisitPrintFunctionCall(PrintFunctionCallContext ctx)
-        {
-            Console.WriteLine(this.Visit(ctx.expression()));
-            return SLValue.VOID;
-        }
-
-        // Assert '(' expression ')'    #assertFunctionCall
-        public override SLValue VisitAssertFunctionCall(AssertFunctionCallContext ctx)
-        {
-            SLValue value = this.Visit(ctx.expression());
-
-            if (!value.isBoolean())
-            {
-                throw new EvalException(ctx);
-            }
-
-            if (!value.asBoolean())
-            {
-                throw new InvalidOperationException("Failed Assertion " + ctx.expression().GetText() + " line:" + ctx.Start.Line);
-            }
-
             return SLValue.VOID;
         }
 
@@ -890,28 +886,9 @@ namespace SinumerikLanguage.Antlr4
             }
         }
 
-        // Size '(' expression ')'      #sizeFunctionCall
-        public override SLValue VisitSizeFunctionCall(SizeFunctionCallContext ctx)
-        {
-            SLValue value = this.Visit(ctx.expression());
-
-            if (value.isString())
-            {
-                return new SLValue(value.asString().Length);
-            }
-
-            if (value.isList())
-            {
-                return new SLValue(value.asList().Count);
-            }
-
-            throw new EvalException(ctx);
-        }
-
         // ifStatement
         public override SLValue VisitIfStatement(IfStatementContext ctx)
         {
-
             // if ...
             if (this.Visit(ctx.ifStat().expression()).asBoolean())
             {
@@ -1376,6 +1353,36 @@ namespace SinumerikLanguage.Antlr4
 
             return SLValue.VOID;
 
+        }
+
+        public override SLValue VisitTurnFunctionCall(TurnFunctionCallContext ctx)
+        {
+            SLValue value = this.Visit(ctx.expression());
+
+            string formatValue;
+
+            formatValue = string.Format("{0:f9}", value.asDouble()).Replace(',', '.');
+
+            GcodeBuffer.Append("TURN=" + formatValue);
+
+            return SLValue.VOID;
+        }
+
+        public override SLValue VisitMsgFunctionCall(MsgFunctionCallContext ctx)
+        {
+            SLValue value = null;
+            StringBuilder message = new StringBuilder();
+            List<ExpressionContext> values = ctx.printvar().expression().ToList();
+            for (int i = 0; i < values.Count; i++)
+            {
+                value = this.Visit(values[i]);
+                message.Append(value?.ToString());
+            }
+
+            lastToken.Clear();
+            GcodeBuffer.Append("MSG(" + message.ToString() + ")");
+            
+            return SLValue.VOID;
         }
 
         public override SLValue VisitGcodeStatement(GcodeStatementContext ctx)

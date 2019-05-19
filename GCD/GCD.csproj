@@ -240,10 +240,6 @@
     <Folder Include="Service\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Users\Petr\source\repos\SinumerikLanguage\SinumerikLanguage\SinumerikLanguage.csproj">
-      <Project>{1a508edb-6e99-4642-b69e-009694e66db8}</Project>
-      <Name>SinumerikLanguage</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj">
       <Project>{6C55B776-26D4-4DB3-A6AB-87E783B2F3D1}</Project>
       <Name>ICSharpCode.AvalonEdit</Name>
@@ -251,6 +247,10 @@
     <ProjectReference Include="..\gcodeparser\gcodeparser.csproj">
       <Project>{A04D3527-40BD-4F61-BB6B-75B1B7E557A9}</Project>
       <Name>gcodeparser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SinumerikLanguage\SinumerikLanguage.csproj">
+      <Project>{1a508edb-6e99-4642-b69e-009694e66db8}</Project>
+      <Name>SinumerikLanguage</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

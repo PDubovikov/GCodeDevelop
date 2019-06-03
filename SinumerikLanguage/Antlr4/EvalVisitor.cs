@@ -20,7 +20,9 @@ namespace SinumerikLanguage.Antlr4
         private static ReturnValue returnValue = new ReturnValue();
         private Scope scope;
         private Dictionary<String, Function> functions;
-        private Dictionary<String, int> NumberedLabel { get; set; }
+        private Dictionary<String, int> numberedLabel;
+        private Dictionary<Tuple<int, String>, int> lineNumberLabel;
+        private Dictionary<Tuple<int, String>, int> reversLineNumberLabel;
         private Dictionary<String, int> numberStatement;
         private StatementContext mainStatement;
         private StatementContext currentStatement;
@@ -38,15 +40,17 @@ namespace SinumerikLanguage.Antlr4
             this.scope = scope;
             this.functions = functions;
             GcodeBuffer = gcodeBuffer;
-            NumberedLabel = new Dictionary<String, int>();
+            numberedLabel = new Dictionary<String, int>();
             numberStatement = new Dictionary<String, int>();
+            lineNumberLabel = new Dictionary<Tuple<int, string>, int>();
+            reversLineNumberLabel = new Dictionary<Tuple<int, string>, int>();
             listBlocks = new List<BlockContext>();
             lastToken = new HashSet<String>();
             icacMode = new HashSet<String>();
         }
 
       
-        void RememberLineLabels(StatementContext[] statements)
+        void RememberStatementLabels(StatementContext[] statements)
         {
             countStatement = -1;
             for (int i = 0; i < statements.Length; ++i)
@@ -56,7 +60,9 @@ namespace SinumerikLanguage.Antlr4
 
                 if (mainStatement.metkaStart() != null)
                 {
-                    NumberedLabel[mainStatement.metkaStart().GetText()] = i; 
+                    string label = mainStatement.metkaStart().GetText();
+                    numberedLabel[label] = i;
+                    lineNumberLabel[Tuple.Create(mainStatement.metkaStart().Stop.Line, label)] = i;
                 }
 
                 if(mainStatement.ifStatement() != null)
@@ -67,6 +73,9 @@ namespace SinumerikLanguage.Antlr4
               //  numberStatement[mainStatement.GetText()] = i;
                 countStatement = i;
             }
+
+            reversLineNumberLabel = lineNumberLabel;
+            reversLineNumberLabel.Reverse();
         }
 
         public override SLValue VisitParse(ParseContext ctx)
@@ -633,12 +642,22 @@ namespace SinumerikLanguage.Antlr4
         public override SLValue VisitVardefinition(VardefinitionContext ctx)
         {
             SLValue newVal = null;
-            //List<ExpressionContext> values = ctx.varlist().expression().ToList();
+    
+//            List<ExpressionContext> values = ctx.varlist().expression.ToList();
 
             foreach (var item in ctx.varlist())
             {
-                if(item.expression() != null)
+              //  var val = new List<SLValue>();
+
+                if (item.expression() != null)
                     newVal = this.Visit(item.expression());
+
+                if (item.indexes() != null)
+                {
+                    SLValue val = scope.resolve(item.Identifier().GetText());
+                    List<ExpressionContext> exps = item.indexes().expression().ToList();
+                    SetAtIndex(item, exps, val, newVal);
+                }
 
                 scope.assign(item.Identifier().GetText(), newVal);
                 newVal = null; 
@@ -914,17 +933,40 @@ namespace SinumerikLanguage.Antlr4
         public override SLValue VisitIfGotostat(IfGotostatContext ctx)
         {
             string destination = ctx.metkaDest().GetText() + ":";
+            ITerminalNode gotobNode = ctx.GotoB();
+            ITerminalNode gotofNode = ctx.GotoF();
+            int metkaLineNumber = -1;
 
             if (this.Visit(ctx.expression()).asBoolean())
-            {
+            {    
                 if (!string.IsNullOrEmpty(destination))
                 {
-                    foreach (var key in NumberedLabel.Keys)
+                    metkaLineNumber = ctx.metkaDest().Start.Line;
+
+                    if (gotobNode != null)
                     {
-                        if (key.Equals(destination))
-                            nextStatement = NumberedLabel[key];
+                        foreach(var key in lineNumberLabel.Keys.OrderByDescending(n=>n))
+                        {                                
+                            if (key.Item2.Equals(destination) && key.Item1 < metkaLineNumber )
+                            {  
+                                nextStatement = lineNumberLabel[key];
+                                break;
+                            }
+                        }        
+                    }
+                    if(gotofNode != null)
+                    {                    
+                        foreach (var key in lineNumberLabel.Keys)
+                        {
+                            if (key.Item2.Equals(destination) && key.Item1 > metkaLineNumber)
+                            {
+                                nextStatement = lineNumberLabel[key];
+                                break;
+                            }
+                        }
                     }
                 }
+                metkaLineNumber = -1;
             }
                 
             return SLValue.VOID;
@@ -935,7 +977,7 @@ namespace SinumerikLanguage.Antlr4
         // ;
         public override SLValue VisitBlock(BlockContext ctx)
         {
-            RememberLineLabels(ctx.statement());
+            RememberStatementLabels(ctx.statement());
 
             scope = new Scope(scope); // create new local scope
             nextStatement = -1;
@@ -993,19 +1035,44 @@ namespace SinumerikLanguage.Antlr4
         // gotoStatement
         public override SLValue VisitGotoStatement(GotoStatementContext ctx)
         {
-            string destination = ctx.Identifier().GetText() +  ":";
+            string destination = ctx.metkaDest().GetText() +  ":";
+            ITerminalNode gotobNode = ctx.GotoB();
+            ITerminalNode gotofNode = ctx.GotoF();
+            int metkaLineNumber = -1;
 
             if (!string.IsNullOrEmpty(destination))
             {
-                  foreach (var key in NumberedLabel.Keys)
-                  {
-                        if (key.Equals(destination))
-                            nextStatement = NumberedLabel[key];
-                  }
-                    
-            }
+                if (!string.IsNullOrEmpty(destination))
+                {
+                    metkaLineNumber = ctx.metkaDest().Start.Line;
 
-       //       return this.Visit(ctx.Identifier());
+                    if (gotobNode != null)
+                    {
+                        foreach (var key in lineNumberLabel.Keys.OrderByDescending(n => n))
+                        {
+                            if (key.Item2.Equals(destination) && key.Item1 < metkaLineNumber)
+                            {
+                                nextStatement = lineNumberLabel[key];
+                                break;
+                            }
+                        }
+                    }
+                    if (gotofNode != null)
+                    {
+                        foreach (var key in lineNumberLabel.Keys)
+                        {
+                            if (key.Item2.Equals(destination) && key.Item1 > metkaLineNumber)
+                            {
+                                nextStatement = lineNumberLabel[key];
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                metkaLineNumber = -1;
+
+            }
                 return SLValue.VOID;
         }
 

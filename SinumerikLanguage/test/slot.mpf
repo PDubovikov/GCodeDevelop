@@ -1,0 +1,88 @@
+N10 ;l106(35)
+N15 ;l101
+N20 R1=0
+N25 R2=0
+N30 R3=0
+N35 R4=0
+N40 R5=0
+N45 R6=0
+N50 ;------------------------------------------------------------
+N55 ; V "R1" I "R2" ZNA4ENIE PO "Y" TO4EK PAZA V RAZMER PAZA 90.4
+N60 ;------------------------------------------------------------
+N65     R1=12.5;           VERH PAZA   NE MENYAT'
+N70     R2=12.5;           NIZ  PAZA   NE MENYAT'
+N75 ;------------------------------------------------------------
+N80 ;                 GLUBINA PO "Z" OBI4NO = -275
+N85 ;                  ESLI EST' IZMENENIE PO "Z"
+N90 ;                       VVESTI V "R3"
+N95     R3=-275;       4ISTOVAYA GLUBINA PO "Z"
+N100 ;-----------------------------------------------------------
+N105 ;                 NA4ALO RADIUSA PO GLUBINE
+N110 ;                  PO RULETKE PRIMERNO 270
+N115 ;                    VVESTI V "R4" +5 mm
+N120     R4=0;   NA4AL'NAYA TO4KA RADIUSA PO "Z" +5 mm
+N125 ;                "R4" DOLGNA BIT' KRATNOY "5"
+N130 ;             OT ETOY TO4KI OBRABOTKA PO 0.5 mm do R3
+N135 ;-----------------------------------------------------------
+N140     R5=2.5;   GLUBINA OBRABOTKI OT "Z"=0 DO "Z"="R4"
+N145 ;                "R5" DOLGNA BIT' KRATNOY "5"
+N150 ;-----------------------------------------------------------
+N155     R6=2.5;            NA4AL'NAYA TO4KA PO "Z"
+N160 ;         ZABIT' "0" ESLI PAZ NADO OBRABOTAT' POLNOSTYU
+N165 ;          ILI PO RULETKE ESLI PAZ OBRABOTAN ZARANEE
+N170 ;                       U4ITIVAT' R4
+N175 ;-----------------------------------------------------------
+N180 ;                      START OBRABOTKI
+N185 ;m31=101
+N190 ;m31=102
+N195 ;m31=103
+N200 ;m31=104
+N205 g56 g17
+N210 g00 g90 Z500 X0 Y0 W0
+N215 B0
+N220 s1100 f1700 m3
+N225 Z5
+N230 g0X-170
+N235 m8
+N240 ;
+N245 ;                NA4ALO OBRABOTKI OT "R6"
+N250 METKA1:
+println("METKA1")
+N255 g00 Y=-R2;         PEREEZD NA NIZ PAZA
+N260 R6=R6-R5;         RAS4ET GLUBINI PO "Z" R5=2.5mm
+N265 g01 Z=R6
+N270 g1X170
+N275 g00 Y=R1;              PEREEZD V VERH PAZA
+N280 g01 X-170;
+N285 IF R6==R4 GOTOF METKA2;
+N290 ;-----------------------------------------------------------
+N295 ;       ESLI "Z"="R4"="-275" Perehod programmi na 0.5 mm 
+N300 ;-----------------------------------------------------------
+N305 GOTOB METKA1
+N310 ;
+N315 METKA2:;         NA4ALO CYCLA PO 0.5 mm
+N320 ;
+N325 F1700
+N330 g01 Z=R4;         "Z"=-275="R4"
+N335 METKA3:
+println("METKA3")                
+N340 g00 Y=-R2
+N345 g01 x170
+N350 IF R4==R3 GOTOF METKA4;
+N355 ;     DLYA TOGO 4TOBI ZAKON4IT' PAZ NA ETOM GE ZNA4ENII "Z"
+N360 ;             "R4"= REALNOE ZNA4ENIE "Z" V DANNIY MOMENT
+N365 ;             "R3"= 4ISTOVOY GLUBINE "-310" 
+N370 R4=R4-0.5
+N375 Z=R4
+N380 g00 y=R1
+N385 g01 x-170
+N390 R4=R4-0.5;             UGLUBLENIE NA 0.5 MM
+N395 Z=R4
+N400 GOTOB METKA3
+N405 METKA4:;     ZAKON4IT' VERH PAZA BEZ DOBAVLENIYA 0.5 mm
+N410 g00 Y=R2
+N415 g01 X-170
+N420 g00 y0
+N425 z300
+N430 m5 m9
+N435 m30          

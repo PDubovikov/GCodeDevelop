@@ -1,15 +1,16 @@
-R1=10
+R1=5
 DEF REAL VAR1=1, VAR2=2, VAR3=3
 DEF REAL VAR5[R1]
-VAR1[0]=12
 
+jdkfdfkdkjfd
+dfdfkldfd
+;
 ;MSG(<<VAR5[0]<<)
-;FOR R2=0 TO 9
-;MSG(<<R2<<);
-;VAR5[R2]=R2
-;ENDFOR
+FOR R2=0 TO 9
+VAR5[R2]=R2*2
+ENDFOR
 
-;IF VAR5[4] == 4
-;G0X=VAR5[4]
-;ENDIF
+IF VAR5[4] == 8
+G0X=VAR5[4]
+ENDIF
 println("END")

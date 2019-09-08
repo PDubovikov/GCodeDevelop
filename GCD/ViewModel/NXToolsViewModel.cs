@@ -29,7 +29,6 @@ namespace GCD.ViewModel
   		private Session _session ;
 		private UFSession _ufsession;
 		private NXSessionInfo nxSessionInfo ;
-		private Part workPart = null;
 		
   		
  		

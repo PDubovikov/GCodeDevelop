@@ -1177,7 +1177,7 @@ namespace gcodeparser
 		            	
 							string tAxis = "tAxisX" + toolAxis.X.ToString("F9") + " " + "tAxisY" + toolAxis.Y.ToString("F9") + " " + "tAxisZ" + toolAxis.Z.ToString("F9") ;
 		          //  		CM_CW_line.Append(motionMode + " " + axis1+trPt.X.ToString("F9") + " " + axis2+trPt.Y.ToString("F9") + " " + axis3+trPt.Z.ToString("F9") + " " + tAxis) ;
-		          			CM_CW_line.Append("GOTO/" + trPt.X.ToString("F9") + "," + trPt.Y.ToString("F9") + "," + trPt.Z.ToString("F9") + "," + toolAxis.X.ToString("F9") + "," + toolAxis.Y.ToString("F9") + "," + toolAxis.Z.ToString("F9")) ;
+		          			CM_CW_line.Append("GOTO/" + trPt.X.ToString("F9") + ";" + trPt.Y.ToString("F9") + ";" + trPt.Z.ToString("F9") + ";" + toolAxis.X.ToString("F9") + ";" + toolAxis.Y.ToString("F9") + ";" + toolAxis.Z.ToString("F9")) ;
 							CM_CW_line.Append('\n');
 		            }
 		            
@@ -1194,7 +1194,125 @@ namespace gcodeparser
 					//	return CM_CW_line.Replace(',','.') ;
 					return CM_CW_line.Replace(',','.') ;
 					
-				}				
+				}
+
+				public StringBuilder NX_LinearMotionWithANG(String ActPlane, MachineStatus mstat, MachineStatus.Axis axis1, double mx_crd, double x_crd, MachineStatus.Axis axis2, double my_crd, double y_crd, MachineStatus.Axis axis3, double mz_crd, double z_crd, double Ang)
+				{
+					CM_CW_line.Clear() ;
+					
+					Point3D findPt = new Point3D() ;
+					Vector3D vector1 = new Vector3D();  // вектор оси инструмента заданный в программе обработки					
+					Vector3D projectResult = new Vector3D(x_crd - mx_crd, y_crd - my_crd, z_crd - mz_crd);
+					Vector3D resultNormalize = projectResult;
+					resultNormalize.Normalize();
+					Vector3D vectorI = new Vector3D();
+					Vector3D vectorK = new Vector3D();
+					Vector3D toolAxis = new Vector3D();
+					Point3D ptc = new Point3D(x_crd, y_crd, z_crd);
+					Matrix3D hRotate = mstat.mbase;
+										
+					if (ActPlane == "G17") { vectorI = new Vector3D(0, 1, 0) ; vectorK = new Vector3D(1, 0, 0) ; vector1 = new Vector3D(0, 0, 1) ; }
+					if (ActPlane == "G18") { vectorI = new Vector3D(1, 0, 0) ; vectorK = new Vector3D(0, 0, 1) ; vector1 = new Vector3D(0, 1, 0) ; }
+					if (ActPlane == "G19") { vectorI = new Vector3D(0, 0, 1) ; vectorK = new Vector3D(0, 1, 0) ; vector1 = new Vector3D(0, 1, 0) ; }
+					
+					toolAxis = Vector3D.Multiply(vector1,mstat.mbase);  // вектора инструмента после поворота системы координат 
+					vectorI = Vector3D.Multiply(vectorI,mstat.mbase) ;
+					vectorK = Vector3D.Multiply(vectorK,mstat.mbase) ;						
+					
+					double directionI = Math.Round(Vector3D.DotProduct(resultNormalize, vectorI), 6) ;
+					double directionK = Math.Round(Vector3D.DotProduct(resultNormalize, vectorK), 6) ;
+					
+				
+					hRotate.RotateAt(new Quaternion(toolAxis, Ang), ptc) ;
+					Vector3D result = Vector3D.Multiply(vectorK, hRotate);
+					result.Normalize();
+					
+					if(!directionI.Equals(0))
+					{	
+						double resultLength = projectResult.Length/Math.Sin(Ang*Math.PI/180) ;
+						result = Vector3D.Multiply(result, Math.Abs(resultLength) );
+						findPt = new Point3D(ptc.X + result.X, ptc.Y + result.Y, ptc.Z + result.Z) ;
+						
+					}
+					if(!directionK.Equals(0)) 
+					{ 
+						double resultLength = projectResult.Length/Math.Cos(Ang*Math.PI/180) ;
+						result = Vector3D.Multiply(result, Math.Abs(resultLength) );
+						findPt = new Point3D(ptc.X + result.X, ptc.Y + result.Y, ptc.Z + result.Z) ;						
+					}
+										
+					mstat.machineCoordinates[MachineStatus.Axis.X] = findPt.X ;
+					mstat.machineCoordinates[MachineStatus.Axis.Y] = findPt.Y ;
+					mstat.machineCoordinates[MachineStatus.Axis.Z] = findPt.Z ;
+					
+					//	result = Vector3D.Multiply(Radius1, hRotate) ;
+					//	rPoint = new Point3D(Result.X + ptcArc.X, Result.Y + ptcArc.Y, Result.Z + ptcArc.Z ) ;					
+					CM_CW_line.Append("GOTO/" + findPt.X.ToString("F6") + ";" + findPt.Y.ToString("F6") + ";" + findPt.Z.ToString("F6") + ";" + toolAxis.X.ToString("F6") + ";" + toolAxis.Y.ToString("F6") + ";" + toolAxis.Z.ToString("F6") );
+					CM_CW_line.Append('\n');
+					
+					return CM_CW_line.Replace(',','.');
+				}
+				
+				public Vector3D GetRndFirstVector(String ActPlane, MachineStatus mstat, MachineStatus.Axis axis1, double mx_crd, double x_crd, MachineStatus.Axis axis2, double my_crd, double y_crd, MachineStatus.Axis axis3, double mz_crd, double z_crd)
+				{
+					Vector3D vectStart = new Vector3D(x_crd - mx_crd, y_crd - my_crd, z_crd - mz_crd) ;
+					
+					return vectStart;
+					
+				}
+				
+				public StringBuilder LinearMotionWithRND(String ActPlane, MachineStatus mstat, Vector3D vectStart, MachineStatus.Axis axis1, double mx_crd, double x_crd, MachineStatus.Axis axis2, double my_crd, double y_crd, MachineStatus.Axis axis3, double mz_crd, double z_crd, double rnd)
+				{
+					CM_CW_line.Clear() ;
+					StringBuilder rndBuilder = new StringBuilder();
+					Vector3D toolAxis = new Vector3D();
+					Vector3D vectorI = new Vector3D();
+					Vector3D vectorK = new Vector3D();
+					Vector3D vector1 = new Vector3D();
+					Vector3D vectEnd = new Vector3D(mx_crd-x_crd, my_crd-y_crd, mz_crd-z_crd) ;
+					Vector3D vectSecond = vectEnd;
+					vectSecond.Normalize();
+					
+					Vector3D vectFirst = vectStart ;
+					vectFirst.Normalize();
+				//	vectFirst.Negate();
+					
+					if (ActPlane == "G17") { vectorI = new Vector3D(0, 1, 0) ; vectorK = new Vector3D(1, 0, 0) ; vector1 = new Vector3D(0, 0, 1) ; }
+					if (ActPlane == "G18") { vectorI = new Vector3D(1, 0, 0) ; vectorK = new Vector3D(0, 0, 1) ; vector1 = new Vector3D(0, 1, 0) ; }
+					if (ActPlane == "G19") { vectorI = new Vector3D(0, 0, 1) ; vectorK = new Vector3D(0, 1, 0) ; vector1 = new Vector3D(0, 1, 0) ; }
+					
+					toolAxis = Vector3D.Multiply(vector1,mstat.mbase);  // вектора инструмента после поворота системы координат
+					vectorK = vectStart ;
+					vectorK.Normalize();
+					vectorI = Vector3D.CrossProduct(vectorK, toolAxis) ;
+					
+					
+					double halhOfAng = Vector3D.AngleBetween(vectStart, vectEnd)*(0.5) ;
+					double deltaVect = rnd/Math.Tan(halhOfAng*Math.PI/180) ;
+					vectFirst = Vector3D.Multiply(vectFirst, deltaVect);
+					vectSecond = Vector3D.Multiply(vectSecond, deltaVect) ;
+					Point3D firstPointArc = new Point3D(vectFirst.X + x_crd, vectFirst.Y + y_crd, vectFirst.Z + z_crd ) ;
+					Point3D secondPointArc = new Point3D(vectSecond.X + x_crd, vectSecond.Y + y_crd, vectSecond.Z + z_crd);
+					
+					double directionI = Math.Round(Vector3D.DotProduct(vectorI, vectSecond), 6) ;
+					double alpha = Vector3D.AngleBetween(vectorI, vectSecond) ;
+
+					string circularMotion = String.Empty ;
+					
+					if (directionI <= 0)
+						circularMotion = NX_circular_motion_CW(ActPlane, mstat, 0.01, MachineStatus.Axis.X, secondPointArc.X, firstPointArc.X, MachineStatus.Axis.Y, secondPointArc.Y, firstPointArc.Y, MachineStatus.Axis.Z, secondPointArc.Z, firstPointArc.Z, rnd, 0 ).ToString();
+					else
+						circularMotion = NX_circular_motion_CCW(ActPlane, mstat, 0.01, MachineStatus.Axis.X, secondPointArc.X, firstPointArc.X, MachineStatus.Axis.Y, secondPointArc.Y, firstPointArc.Y, MachineStatus.Axis.Z, secondPointArc.Z, firstPointArc.Z, rnd, 0 ).ToString();
+					
+					rndBuilder.Append("GOTO/" + firstPointArc.X.ToString("F6") + ";" + firstPointArc.Y.ToString("F6") + ";" + firstPointArc.Z.ToString("F6") + ";" + toolAxis.X.ToString("F6") + ";" + toolAxis.Y.ToString("F6") + ";" + toolAxis.Z.ToString("F6"));
+					rndBuilder.Append('\n');
+					rndBuilder.Append(circularMotion);
+					rndBuilder.Append("GOTO/" + mx_crd.ToString("F6") + ";" + my_crd.ToString("F6") + ";" + mz_crd.ToString("F6") + ";" + toolAxis.X.ToString("F6") + ";" + toolAxis.Y.ToString("F6") + ";" + toolAxis.Z.ToString("F6"));
+					rndBuilder.Append('\n');
+					
+					return rndBuilder.Replace(',','.');
+				}
+											
 										
 	}
 }

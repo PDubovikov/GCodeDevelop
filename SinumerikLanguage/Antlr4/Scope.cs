@@ -13,9 +13,22 @@ namespace SinumerikLanguage.Antlr4
         private Scope _parent;
 
         private Dictionary<String, SLValue> variables;
+        private static Dictionary<String, SLValue> globalVariables;
+
+
+        static Scope()
+        {
+            globalVariables = new Dictionary<string, SLValue>();
+            for(int i=0; i<200; i++)
+            {
+                globalVariables["R" + i] = new SLValue(default(double));
+            }
+
+        }
 
         public Scope():this(null)
         {
+            //globalVariables = new Dictionary<string, SLValue>();
             // only for the global scope, the parent is null
         }
 
@@ -23,7 +36,7 @@ namespace SinumerikLanguage.Antlr4
         {
             _parent = p;
             variables = new Dictionary<string, SLValue>();
-           
+
         }
 
         public void assignParam(String var, SLValue value)
@@ -45,7 +58,13 @@ namespace SinumerikLanguage.Antlr4
             }
         }
 
-        private bool isGlobalScope()
+        public void GlobalAssign(String var, SLValue value)
+        {
+            globalVariables[var] = value;
+        }
+
+
+        private bool isParentScope()
         {
             return _parent == null;
         }
@@ -72,24 +91,50 @@ namespace SinumerikLanguage.Antlr4
 
         public SLValue resolve(String var)
         {
-            
+
             if (variables.ContainsKey(var))
             {
                 // The variable resides in this scope
                 return variables[var];
             }
-            else if (!isGlobalScope())
+            else if (!isParentScope())
             {
                 // Let the parent scope look for the variable
                 return _parent.resolve(var);
+            }
+            else if (globalVariables.ContainsKey(var))
+            {
+                variables[var] = globalVariables[var];        
+                return variables[var];
             }
             else
             {
                 // Unknown variable
                 return null;
+            }    
+        }
+
+        public SLValue GetDefaultValue(string typeValue)
+        {
+
+            switch(typeValue)
+            {
+                case "REAL":
+                    return new SLValue(default(double));
+                case "INT":
+                    return new SLValue(default(int));
+                case "BOOL":
+                    return new SLValue(default(bool));
+                case "STRING":
+                    return new SLValue(default(string));
+                case "CHAR":
+                    return new SLValue(default(char));
+                default:
+                    return SLValue.NULL;
+
             }
         }
-        
+
         public override String ToString()
         {
             StringBuilder sb = new StringBuilder();

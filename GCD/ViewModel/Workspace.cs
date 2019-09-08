@@ -56,7 +56,7 @@ namespace GCD.ViewModel
       get
       {
         if (_tools == null)
-          _tools = new ToolViewModel[] { FileStats, NXTools };
+          _tools = new ToolViewModel[] { FileStats, NXTools, Errors };
         return _tools;
       }
     }   
@@ -84,6 +84,19 @@ namespace GCD.ViewModel
         return _nxTools;
       }
     }
+    
+    ErrorsViewModel _errors = null;
+    public ErrorsViewModel Errors
+    {
+      get
+      {
+        if (_errors == null)
+          _errors = new ErrorsViewModel();
+
+        return _errors;
+      }
+    }
+    
    
     #region OpenCommand
     RelayCommand _openCommand = null;
@@ -388,6 +401,10 @@ namespace GCD.ViewModel
       ActiveDocument.IsDirty = false; 
     }
     #endregion close save file handling methods
-        
+     
+    internal void Exit()
+    {
+    	App.Current.Shutdown();
+    }
   }
 }

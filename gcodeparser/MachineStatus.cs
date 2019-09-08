@@ -30,6 +30,7 @@ namespace gcodeparser
 		private IDictionary<Axis, double?> coordinatesOld = new Dictionary<Axis, double?>();
 		private IDictionary<Axis, double?> originalCoordinatesOld = new Dictionary<Axis, double?>(); // dictionary for calculate arc center point
 		public IDictionary<Axis, double?> newPosition = new Dictionary<Axis,double?>() ;
+		private IDictionary<NonModalsVars, double?> varsCash = new Dictionary<NonModalsVars,double?>();
 		public StringBuilder newLine = new StringBuilder() ;
 		private bool coordinatesCachesDirty = true;
 		public bool rotAxMode = false ;
@@ -37,9 +38,9 @@ namespace gcodeparser
 		public Matrix3D mToolAx ;
 		public Vector3D ToolAxis = new Vector3D();
 		public Matrix3D origin = new Matrix3D() ;
-		public Point3D Value ;
+		private Point3D Value ;
 		private Point3D VarValue ;
-		public Point3D ValueCash ;
+		private Point3D ValueCash ;
 		private Point3D Ptc, Ptr ;
 		private Point3D RotValue ;
 		private Point3D RotValueCash ;
@@ -78,7 +79,7 @@ namespace gcodeparser
 		// These variables can be set during the block, but will get cleared out when a new block starts
 		public enum NonModalsVars
 		{
-			P,I,K,J,L,R,CR,T,TURN
+			P,I,K,J,L,R,CR,T,TURN,ANG,RND,CHR
 		}
 
 		// Axis words to be copied in the coordinates
@@ -124,6 +125,9 @@ namespace gcodeparser
 						break ;
 				}
 			}
+			
+			machineCoordinatesVars[NonModalsVars.RND] = 0.0 ;
+			
 			foreach (ModalWords modalwords in Enum.GetValues(typeof(ModalWords)))
 			{			         	
 			     collectionsWords.Add(modalwords.ToString());
@@ -642,7 +646,7 @@ namespace gcodeparser
             	}
            		else
            		{
-          			machineCoordinatesVars[Vars] = 0.0 ;
+          				machineCoordinatesVars[Vars] = 0.0 ;
            		}
         	}
     	}		
@@ -669,6 +673,7 @@ namespace gcodeparser
 			foreach (NonModalsVars item in Enum.GetValues(typeof(NonModalsVars)))
 			{
 				modalVars.Remove(item.ToString());
+				varsCash[NonModalsVars.RND] = machineCoordinatesVars[NonModalsVars.RND].Value;
 				
 			}
 			foreach (NonModals item in Enum.GetValues(typeof(NonModals)))
@@ -687,31 +692,11 @@ namespace gcodeparser
 					RotValueCash.Y = machineCoordinates[Axis.B].Value ;
 					RotValueCash.Z = machineCoordinates[Axis.C].Value ;
 						
-		//				Console.WriteLine("ValueCash.X: " + ValueCash.X + " " + "ValueCash.Y: " + ValueCash.Y + " " + "ValueCash.Z: " + ValueCash.Z ) ;
+		//			Console.WriteLine("ValueCash.X: " + ValueCash.X + " " + "ValueCash.Y: " + ValueCash.Y + " " + "ValueCash.Z: " + ValueCash.Z ) ;
 			}				
 		}
 
-/// <summary>
-/// 
-/// </summary>
-/// <returns></returns>		
-		
-		private void TURN_MODE(IDictionary<string, ParsedWord> block)
-		{			
-//				if (block.ContainsKey(Axis.X.ToString()))
-//				{					
-//					machineCoordinates[Axis.X] = machineCoordinates[Axis.X]*0.5;
-//		//			machineCoordinates[Axis.X] = 0.0 ;
-//					
-//				}
-//				if (block.ContainsKey(NonModalsVars.I.ToString()))
-//				{
-//					ParsedWord word = block[NonModalsVars.I.ToString()];
-//
-//					machineCoordinatesVars[NonModalsVars.I] = word.value*0.5 - coordinatesOld[Axis.X] ;
-//				}
-		 }
-		
+			
 /// <summary>
 /// 
 /// </summary>
@@ -773,6 +758,14 @@ namespace gcodeparser
 			get
 			{
 				return new ReadOnlyDictionary<NonModalsVars, double?>(machineCoordinatesVars);
+			}
+		}
+		
+		public virtual IDictionary<NonModalsVars, double?> RndCashVars
+		{
+			get
+			{
+				return new ReadOnlyDictionary<NonModalsVars, double?>(varsCash);
 			}
 		}
 

@@ -26,8 +26,7 @@ namespace ICSharpCode.AvalonEdit
       {
         HighlightingManager.Instance.InitializeDefinitions();
 
-        string path = Path.GetDirectoryName(Directory.GetCurrentDirectory());
-        path = path.Remove(path.Length - 4);
+        string path = Path.GetDirectoryName(Application.ResourceAssembly.Location);
         path = Path.Combine(path , "AvalonEdit\\Highlighting");
 
         if (Directory.Exists(path))

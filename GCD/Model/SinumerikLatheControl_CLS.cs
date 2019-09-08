@@ -23,6 +23,8 @@ namespace GCD.Model
 				ISet<String> listOffset = new HashSet<String>() ;
 				private double Tolerance {get ; set ;}
 				private Matrix3D mcsData ;
+				private Vector3D rndFirstVector;
+				private bool rndStrokeMode = false;
 				int startIndex, endIndex ;
 		
 				public SinumerikLatheControl_CLS(): base()
@@ -43,7 +45,10 @@ namespace GCD.Model
 					String coordinateSystem = base.machine.getCoordinateSystems() ;
 			
 					Vector3D toolAx = motion.GetToolAxis(MachiningPlane, machineStatus);
-					
+					if(currentLine.Contains("MSG"))
+					{
+						MessageBox.Show(currentLine.Substring(4,currentLine.Length-5));
+					}
 					if (parser.findWordInBlock(new StringBuilder(currentLine)) != null)
 					{
 						
@@ -59,9 +64,9 @@ namespace GCD.Model
 								
 						
 						base.StartNXPathSettings(currentBlock) ;
-						base.LinearMotion(motionMode, toolAx, false);
+						LinearMotion(motionMode, MachiningPlane, currentBlock, machineStatus, toolAx, false);
 						base.CircularMotion(machineStatus, currentBlock, motionMode, MachiningPlane, false) ;
-																		
+						base.ThreadTurnMotion(motionMode, currentBlock, toolAx) ;
 						base.EndNXPathSettings(currentBlock) ;
 						
 					}
@@ -94,6 +99,37 @@ namespace GCD.Model
 						SCM_CW.Append('\n');
 						SCM_CW.Append("PAINT/PATH") ;
 						SCM_CW.Append('\n');
+				}
+				
+				public override void LinearMotion(string motionMode, string MachiningPlane, IDictionary<String, ParsedWord> currentBlock, MachineStatus mstat, Vector3D toolAx,  bool helixMode)
+				{
+					if ( (motionMode == "G1" || motionMode == "G0") && helixMode == false )
+					{
+						double rnd = machine.getRND();
+						
+						if(rndStrokeMode)
+						{
+							string linearWithRnd = motion.LinearMotionWithRND(MachiningPlane, mstat, rndFirstVector, MachineStatus.Axis.X, machine.getMX(), machine.getX(), MachineStatus.Axis.Y, machine.getMY(), machine.getY(), MachineStatus.Axis.Z, machine.getMZ(), machine.getZ(), machine.getRND() ).ToString();
+							SCM_CW.Append(linearWithRnd) ;
+							rndStrokeMode = false;
+						}
+						else if (currentBlock.ContainsKey("ANG"))
+						{
+							string linearWithAng = motion.NX_LinearMotionWithANG(MachiningPlane, mstat, MachineStatus.Axis.X, machine.getMX(), machine.getX(), MachineStatus.Axis.Y, machine.getMY(), machine.getY(), MachineStatus.Axis.Z, machine.getMZ(), machine.getZ(), machine.getANG() ).ToString();
+							SCM_CW.Append(linearWithAng) ;
+						}
+						else if (currentBlock.ContainsKey("RND"))
+						{
+							rndFirstVector = motion.GetRndFirstVector(MachiningPlane, mstat, MachineStatus.Axis.X, machine.getMX(), machine.getX(), MachineStatus.Axis.Y, machine.getMY(), machine.getY(), MachineStatus.Axis.Z, machine.getMZ(), machine.getZ()) ;
+							rndStrokeMode = true;
+						}
+						else
+						{
+							SCM_CW.Append("GOTO/" + machine.getMX().ToString("F6") + ";" + machine.getMY().ToString("F6") + ";" + machine.getMZ().ToString("F6") + ";" + toolAx.X.ToString("F6") + ";" + toolAx.Y.ToString("F6") + ";" + toolAx.Z.ToString("F6"));
+							SCM_CW.Append('\n') ;
+						}
+						
+					}
 				}
 				
 		

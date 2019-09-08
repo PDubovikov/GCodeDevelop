@@ -121,7 +121,9 @@
     <Compile Include="Converter\ActiveDocumentConverter.cs" />
     <Compile Include="Converter\ActiveDocumentToVisibilityConverter.cs" />
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
+    <Compile Include="Model\LatheMachineControl_CLS.cs" />
     <Compile Include="Model\MayakLatheControl_CLS.cs" />
+    <Compile Include="Model\SinumerikCompiler.cs" />
     <Compile Include="Model\SinumerikLatheControl_CLS.cs" />
     <Compile Include="Model\MachineControl_CLS.cs" />
     <Compile Include="Model\CoordinatOffsetInfo.cs" />
@@ -130,7 +132,9 @@
     <Compile Include="Model\MCSManager.cs" />
     <Compile Include="Model\NXSessionInfo.cs" />
     <Compile Include="Model\NXSessionManager.cs" />
+    <Compile Include="Model\SinumerikMillControl_CLS.cs" />
     <Compile Include="ViewModel\AvalonDockLayoutViewModel.cs" />
+    <Compile Include="ViewModel\ErrorsViewModel.cs" />
     <Compile Include="ViewModel\FileStatsViewModel.cs" />
     <Compile Include="ViewModel\FileViewModel.cs" />
     <Compile Include="ViewModel\CoordinatOffsetViewModel.cs" />
@@ -190,8 +194,6 @@
     <Resource Include="Images\App\update2.png" />
     <Resource Include="Images\App\update3.png" />
     <Resource Include="Images\App\update4.png" />
-    <None Include="AvalonEdit\Highlighting\01_XML-Mode.xshd" />
-    <None Include="AvalonEdit\Highlighting\Log.xshd" />
     <None Include="AvalonEdit\Highlighting\Mayak600T.xshd" />
     <None Include="AvalonEdit\Highlighting\Okuma_Mill.xshd" />
     <None Include="AvalonEdit\Highlighting\Sinumerik520K.xshd" />
@@ -199,7 +201,129 @@
     <None Include="AvalonEdit\Highlighting\Sinumerik840D_Mill_Adv.xshd" />
     <None Include="AvalonEdit\Highlighting\Sinumerik840D_Turn.xshd" />
     <None Include="AvalonEdit\Highlighting\Sinumerik840D_Turn_Adv.xshd" />
-    <None Include="AvalonEdit\Highlighting\TXT.xshd" />
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\123.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\case_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\chamfer_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\cycle801_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\cycle81_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\cycle82_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\cycle_konus.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\goto_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\holes1_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\holes2_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\ifelse_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\ifgoto_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\kanavka_sfera_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\kanavka_vint_sector.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\konus_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\Main.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\mcall_proc_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\proc1_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\repeat_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\slot.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Main\while_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\BAR_CENTR.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\BAR_RAD.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\CHAMFER.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\CYCLE801.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\CYCLE81.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\CYCLE82.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\CYCLE_KONUS.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\HOLES1.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\HOLES2.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\KANAVKA_SFERA.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\KONUS.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\L106.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\L140.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\L142.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Mill\Sub\L143.spf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Turn\Main\Main.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Turn\Main\threadturn_test.mpf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Turn\Sub\BAR_CENTR.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="MachineControls\Sinumerik840D_Turn\Sub\BAR_RAD.SPF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -237,6 +361,10 @@
     <Resource Include="Images\property-blue.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="MachineControls\Mayak\Main\" />
+    <Folder Include="MachineControls\Mayak\Sub\" />
+    <Folder Include="MachineControls\Okuma\Main\" />
+    <Folder Include="MachineControls\Okuma\Sub\" />
     <Folder Include="Service\" />
   </ItemGroup>
   <ItemGroup>
@@ -252,6 +380,15 @@
       <Project>{1a508edb-6e99-4642-b69e-009694e66db8}</Project>
       <Name>SinumerikLanguage</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Errors.png" />
+    <Resource Include="Images\graphic630.gif" />
+    <Resource Include="Images\nxtools.png" />
+    <Resource Include="Images\warn.png" />
+    <Resource Include="Images\warn2.png" />
+    <Resource Include="Images\warning.gif" />
+    <Resource Include="Images\warnings.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -49,7 +49,7 @@ namespace GCD.Model
 					String motionMode = machine.getMotionMode() ;
 					String coordinateSystem = machine.getCoordinateSystems() ;
 					bool helixMode = false;
-					Vector3D toolAx = motion.GetToolAxis(MachiningPlane, machineStatus); 
+					Vector3D toolAx = motion.GetToolAxis(MachiningPlane, machineStatus);
 					
 					if (parser.findWordInBlock(new StringBuilder(currentLine)) != null)
 					{	
@@ -77,9 +77,11 @@ namespace GCD.Model
 												
 						RotAxisMotion(currentBlock, motionMode, MachiningPlane, machineStatus, Tolerance) ;
 						
-						LinearMotion(motionMode, toolAx, helixMode) ;
+						LinearMotion(motionMode, MachiningPlane, currentBlock, machineStatus, toolAx, helixMode) ;
 						
 						CircularMotion(machineStatus, currentBlock, motionMode, MachiningPlane, helixMode) ;
+						
+						ThreadTurnMotion(motionMode, currentBlock, toolAx) ;
 																		
 						EndNXPathSettings(currentBlock) ;
 						
@@ -132,18 +134,17 @@ namespace GCD.Model
 					
 				}
 				
-				public virtual void LinearMotion(string motionMode, Vector3D toolAx, bool helixMode)
+				public virtual void LinearMotion(string motionMode, string MachiningPlane, IDictionary<String, ParsedWord> currentBlock, MachineStatus mstat, Vector3D toolAx, bool helixMode)
 				{
 						if (motionMode == "G1" && helixMode == false )						
 						{
-								
 							SCM_CW.Append("GOTO/" + machine.getMX().ToString("F6") + ";" + machine.getMY().ToString("F6") + ";" + machine.getMZ().ToString("F6") + ";" + toolAx.X.ToString("F6") + ";" + toolAx.Y.ToString("F6") + ";" + toolAx.Z.ToString("F6"));
 							SCM_CW.Append('\n') ;
+
 						}
 						if (motionMode == "G0" && helixMode == false)
 						{
-							SCM_CW.Append("RAPID") ;
-							SCM_CW.Append('\n') ;
+							
 							SCM_CW.Append("GOTO/" + machine.getMX().ToString("F6") + ";" + machine.getMY().ToString("F6") + ";" + machine.getMZ().ToString("F6") + ";" + toolAx.X.ToString("F6") + ";" + toolAx.Y.ToString("F6") + ";" + toolAx.Z.ToString("F6"));
 							SCM_CW.Append('\n');
 						}
@@ -159,7 +160,6 @@ namespace GCD.Model
 								string CM_CW_string = motion.NX_circular_motion_CW(MachiningPlane, machineStatus, 0.01, MachineStatus.Axis.X, machine.getMX(), machine.getX(), MachineStatus.Axis.Y, machine.getMY(), machine.getY(), MachineStatus.Axis.Z, machine.getMZ(), machine.getZ(), machine.getI(), machine.getJ(), machine.getK(), machine.getTURN()).ToString() ;
 								
 								SCM_CW.Append(CM_CW_string) ;
-
 							}
 							if (currentBlock.ContainsKey("CR") )
 							{
@@ -190,6 +190,18 @@ namespace GCD.Model
 							
 						}
 						
+				}
+				
+				public virtual void ThreadTurnMotion(string motionMode, IDictionary<String, ParsedWord> currentBlock, Vector3D toolAx)
+				{
+					
+					if(motionMode == "G33")
+					{
+							SCM_CW.Append("THREAD/TURN" +";" + "PITCH"+ ";" + machine.getK().ToString("F6"));
+							SCM_CW.Append('\n');
+							SCM_CW.Append("GOTO/" + machine.getMX().ToString("F6") + ";" + machine.getMY().ToString("F6") + ";" + machine.getMZ().ToString("F6") + ";" + toolAx.X.ToString("F6") + ";" + toolAx.Y.ToString("F6") + ";" + toolAx.Z.ToString("F6"));
+							SCM_CW.Append('\n') ;
+					}
 				}
 				
 				public virtual void RotAxisMotion(IDictionary<String, ParsedWord> currentBlock, string motionMode, string MachiningPlane, MachineStatus machineStatus, double Tolerance)
@@ -234,10 +246,13 @@ namespace GCD.Model
 								case "G0":
 									SCM_CW.Append("PAINT/COLOR" + ";" + 186) ;
 									SCM_CW.Append('\n') ;
+									SCM_CW.Append("RAPID") ;
+									SCM_CW.Append('\n') ;
 									break;
 								case "G1":
 								case "G2":
 								case "G3":
+								case "G33":
 									SCM_CW.Append("PAINT/COLOR" + ";" + 31) ;
 									SCM_CW.Append('\n') ;
 									break;	

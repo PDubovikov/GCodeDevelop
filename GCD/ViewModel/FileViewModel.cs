@@ -437,6 +437,34 @@ namespace GCD.ViewModel
     }
     #endregion
     
+    
+    #region ExitCommand
+    RelayCommand _exitCommand = null;
+    public ICommand ExitCommand
+    {
+      get
+      {
+        if (_exitCommand == null)
+        {
+          _exitCommand = new RelayCommand((p) => OnExit(), (p) => CanExit());
+        }
+
+        return _exitCommand;
+      }
+    }
+
+    private bool CanExit()
+    {
+      return true;
+    }
+
+    private void OnExit()
+    {
+    	Workspace.This.Exit();
+    }
+    #endregion
+    
+    
     RelayCommand _fontScaleCommand = null;
     public ICommand FontScaleCommand
     {
@@ -511,12 +539,13 @@ namespace GCD.ViewModel
     
 	async void Processing(object param)
 	{
-			strProcessEnabled = false ; 
+			strProcessEnabled = false ;
+			String Controller = "";
 			System.Threading.CancellationToken cancellationToken ;
 			cts = new CancellationTokenSource() ;
 			cancellationToken = cts.Token ;
-			string Controller = param.ToString() ;
-			
+			if(param != null) { Controller = param.ToString() ;}
+				
 			switch(Controller)
 			{
 				case "Sinumerik 840D_Mill":
@@ -560,21 +589,38 @@ namespace GCD.ViewModel
 				}
 				case "Sinumerik 840D_Mill_Adv":
 				{
-					string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Mill_Adv.cls" ;	
+					string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Mill_Adv.cls" ;
 					try 
-					{
-						await sin840_calculate_mill_adv(cancellationToken);							
-						if(File.Exists(_fullPath))
+					{						
+							
+						using(TextWriter errorLog = new StreamWriter("Log.txt"))
 						{
-							Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(_fullPath)) ;
-							Workspace.This.FileStats.IsDocActive = true ;
+							await sin840_calculate_mill_adv(cancellationToken, errorLog);
+
+							if(File.Exists(_fullPath))
+							{
+								Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(_fullPath)) ;
+								Workspace.This.FileStats.IsDocActive = true ;
+							}
+						
 						}
+							if(File.Exists("Log.txt"))
+							{
+								Workspace.This.Errors.ErrorsOutputDocument = new TextDocument(File.ReadAllText("Log.txt"));
+								Workspace.This.Errors.IsDocActive = true ;
+							}
+										
 					}
 					catch(Exception ex)
 					{
 						cts.Cancel();
-						MessageBox.Show(ex.Message) ;
+						if(File.Exists("Log.txt"))
+						{
+							Workspace.This.Errors.ErrorsOutputDocument = new TextDocument(File.ReadAllText("Log.txt") + '\n' + ex.Message);
+							Workspace.This.Errors.IsDocActive = true ;
+						} 
 					}
+
 					break;
 				}	
 				case "Sinumerik 840D_Turn_Adv":
@@ -582,18 +628,31 @@ namespace GCD.ViewModel
 					string __fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Turn.cls" ;	
 					try 
 					{
-							await sin840_calculate_turn_adv(cancellationToken);
+						using(TextWriter errorLog = new StreamWriter("Log.txt"))
+						{
+							await sin840_calculate_turn_adv(cancellationToken, errorLog);
 							
 							if(File.Exists(__fullPath))
 							{
 								Workspace.This.FileStats.ConsoleDocument = new TextDocument(File.ReadAllText(__fullPath)) ;
 								Workspace.This.FileStats.IsDocActive = true ;
 							}
+						}
+						
+						if(File.Exists("Log.txt"))
+						{
+								Workspace.This.Errors.ErrorsOutputDocument = new TextDocument(File.ReadAllText("Log.txt"));
+								Workspace.This.Errors.IsDocActive = true ;
+						}
 					}
 					catch(Exception ex)
 					{
 						cts.Cancel();
-						MessageBox.Show(ex.Message) ;
+						if(File.Exists("Log.txt"))
+						{
+							Workspace.This.Errors.ErrorsOutputDocument = new TextDocument(File.ReadAllText("Log.txt") + '\n' + ex.Message);
+							Workspace.This.Errors.IsDocActive = true ;
+						} 
 					}
 					break;
 				}
@@ -678,6 +737,26 @@ namespace GCD.ViewModel
 	
 	public event EventHandler StringBufferChanged;
 	
+	private TextWriter _logWriter = null;
+	public TextWriter LogWriter
+	{
+		
+		get { return _logWriter; }
+		set
+		{
+			if(_logWriter != value)
+			{
+				_logWriter = value ;
+				RaisePropertyChanged("LogWriter") ;
+				if (LogBufferChanged != null)
+					LogBufferChanged(this, EventArgs.Empty);
+			}
+			
+		}
+	}
+	
+	public event EventHandler LogBufferChanged;
+	
 	Task sin840_calculate_mill(System.Threading.CancellationToken cancellationToken)
 	{
 			StringBuilder strb1 = new StringBuilder(Document.Text) ;
@@ -687,7 +766,7 @@ namespace GCD.ViewModel
 		//	File.WriteAllText("Program_S840_Text.txt", strb1.ToString()) ;
 			StringBuilder paramprog = new StringBuilder() ;
 			return Task.Run(() => {			    			
-				MachineControl_CLS mcontrolCLS = new MachineControl_CLS();
+				SinumerikMillControl_CLS mcontrolCLS = new SinumerikMillControl_CLS();
 				GCodeParser parser = new GCodeParser(null, strb1, "Sinumerik", mcontrolCLS);
 				
 				File.WriteAllText(_fullPath, mcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
@@ -700,37 +779,25 @@ namespace GCD.ViewModel
 			
 	}
 	
-	Task sin840_calculate_mill_adv(System.Threading.CancellationToken cancellationToken)
+	Task sin840_calculate_mill_adv(System.Threading.CancellationToken cancellationToken, TextWriter errorLog)
 	{
 			string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Mill_Adv.cls" ;
 			string _fileNameAddPrefix = FileNameExceptExtension + "_S840D_Mill_Adv" ;
-			SinumerikLexer lexer = new SinumerikLexer(CharStreams.fromstring(Document.Text));
 
-		//	File.WriteAllText("Program_S840_Text.txt", strb1.ToString()) ;
+            SinumerikCompiler compiler = new SinumerikCompiler(Document, errorLog, MachineType.Mill);
+
 			StringBuilder gcodeOutput = new StringBuilder() ;
 			return Task.Run(() => {
-			    	
-					SinumerikParser sinuParser = new SinumerikParser(new CommonTokenStream(lexer));
-					sinuParser.BuildParseTree = true;
-                	IParseTree tree = sinuParser.parse();
-					
-                	Scope scope = new Scope();
-                	var functions = new Dictionary<string, Function>();
-                	SymbolVisitor symbolVisitor = new SymbolVisitor(functions);
-                	symbolVisitor.Visit(tree);
-                	EvalVisitor visitor = new EvalVisitor(scope, functions, gcodeOutput);
-					visitor.Visit(tree);
-					
-					cancellationToken.ThrowIfCancellationRequested();
-             //   	gcodeOutput.Append(visitor.GcodeBuffer);
-					MachineControl_CLS mcontrolCLS = new MachineControl_CLS();
+			    						
+                	cancellationToken.ThrowIfCancellationRequested();
+                    gcodeOutput = compiler.Compile();
+
+					SinumerikMillControl_CLS mcontrolCLS = new SinumerikMillControl_CLS();
 					GCodeParser parser = new GCodeParser(null, gcodeOutput, "Sinumerik", mcontrolCLS);
 					
 					File.WriteAllText(_fullPath, mcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;
 
-					NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, false) ;
-					
-					
+					NXSessionManager.Instance.ExportClsfToNX(_fullPath, _fileNameAddPrefix, false) ;						
 				 	
 			}, cancellationToken
 			);
@@ -758,30 +825,19 @@ namespace GCD.ViewModel
 			                
 	}
 	
-	Task sin840_calculate_turn_adv(System.Threading.CancellationToken cancellationToken)
+	Task sin840_calculate_turn_adv(System.Threading.CancellationToken cancellationToken, TextWriter errorLog)
 	{
 			StringBuilder gcodeOutput = new StringBuilder() ;
 			string _fullPath = FileDirectoryName + FileNameExceptExtension + "_S840D_Turn.cls" ;
 			string _fileNameAddPrefix = FileNameExceptExtension + "_S840D_Turn" ;
-			SinumerikLexer lexer = new SinumerikLexer(CharStreams.fromstring(Document.Text));
-			
-			StringBuilder paramprog = new StringBuilder();
+
+            SinumerikCompiler compiler = new SinumerikCompiler(Document, errorLog, MachineType.Turn);
+            StringBuilder paramprog = new StringBuilder();
 			return Task.Run(() => {
-
-				SinumerikParser sinuParser = new SinumerikParser(new CommonTokenStream(lexer));
-				sinuParser.BuildParseTree = true;
-                IParseTree tree = sinuParser.parse();
-				
-                Scope scope = new Scope();
-                var functions = new Dictionary<string, Function>();
-                SymbolVisitor symbolVisitor = new SymbolVisitor(functions);
-                symbolVisitor.Visit(tree);
-                EvalVisitor visitor = new EvalVisitor(scope, functions, gcodeOutput);
-				visitor.Visit(tree);
-
+			                	
                 cancellationToken.ThrowIfCancellationRequested();
-                
-				SinumerikLatheControl_CLS lmcontrolCLS = new SinumerikLatheControl_CLS();
+                gcodeOutput = compiler.Compile();
+                SinumerikLatheControl_CLS lmcontrolCLS = new SinumerikLatheControl_CLS();
 				GCodeParser parser = new GCodeParser(null, gcodeOutput, "Sinumerik", lmcontrolCLS);
 				
 				File.WriteAllText(_fullPath, lmcontrolCLS.SCM_CW.ToString().Replace(';',',')) ;

@@ -10,7 +10,7 @@ block
 
 statement
  : assignment
-// | coordinateStatement
+ | vardefinition
  | gcodeStatement
  | functionCall
  | ifStatement
@@ -20,19 +20,20 @@ statement
  | gotoStatement
  | metkaStart
  | crlfStatement
+ | returnStatement
  ;
 
 assignment
  : Identifier indexes? '=' expression
- | Def typeDef varlist indexes? '='? expression?
  ;
+
+vardefinition
+: Def typeDef varlist+
+;
 
 functionCall
  : Identifier '(' exprList? ')'             #identifierFunctionCall
  | Println '(' expression? ')'              #printlnFunctionCall
- | Print '(' expression ')'                 #printFunctionCall
- | Assert '(' expression ')'                #assertFunctionCall
- | Size '(' expression ')'                  #sizeFunctionCall
  | Sin '(' expression ')'                   #sinFunctionCall
  | Cos '(' expression ')'                   #cosFunctionCall
  | Tan '(' expression ')'                   #tanFunctionCall
@@ -61,6 +62,11 @@ functionCall
  | Diamon                                   #diamonFunctionCall
  | Diamof                                   #diamofFunctionCall
  | Diam90                                   #diam90FunctionCall
+ | Displof                                  #displofFunctionCall
+ | Displon                                  #displonFunctionCall
+ | Sblof                                    #sblofFunctionCall
+ | Sblon                                    #sblonFunctionCall
+ | Save                                     #saveFunctionCall
  | Xaxis '=' expression                     #xcoordFunctionCall
  | Yaxis '=' expression                     #ycoordFunctionCall
  | Zaxis '=' expression                     #zcoordFunctionCall
@@ -83,7 +89,9 @@ functionCall
  | TFunc '=' String                         #toolNameFunctionCall
  | DFunc                                    #toolIDFunctionCall
  | SubProg '(' exprList? ')'                #subprogramFunctionCall
- | Msg '(' expression ')'                   #msgFunctionCall
+ | Msg '(' printvar? ')'                    #msgFunctionCall
+ | Setal '(' expression ')'                 #setalFunctionCall
+ | Stopre                                   #stopreFunctionCall
  ;
 
 
@@ -118,9 +126,9 @@ whileStatement
  ;
 
  gotoStatement
- : GotoB Identifier
- | GotoF Identifier
- | Goto Identifier
+ : GotoB metkaDest
+ | GotoF metkaDest
+ | Goto metkaDest
  ;
 
 returnStatement
@@ -158,18 +166,6 @@ expression
  | Input '(' String? ')'                                #inputExpression
  ;
 
-//coordinateStatement
-// : Xaxis '-'? Number                                     #xcoordCoordinates
-// | Yaxis '-'? Number                                     #ycoordCoordinates
-// | Zaxis '-'? Number                                     #zcoordCoordinates
-// | Aaxis '-'? Number                                     #acoordCoordinates
-// | Baxis '-'? Number                                     #bcoordCoordinates
-// | Caxis '-'? Number                                     #ccoordCoordinates
-// | Uaxis '-'? Number                                     #ucoordCoordinates
-// | Vaxis '-'? Number                                     #vcoordCoordinates
-// | Waxis '-'? Number                                     #wcoordCoordinates
-// ;
-
 gcodeStatement
 : GCodeText (GCodeText CR?)*
 ;
@@ -179,7 +175,7 @@ list
  ;
 
 varlist
-   : Identifier (',' Identifier)*
+   : Identifier indexes? '='? expression? ','?
    ;
 
 typeDef
@@ -194,6 +190,10 @@ typeDef
 
 indexes
  : ( '[' expression ']' )+
+ ;
+
+printvar
+ : ('<<'? expression '<<'?)+
  ;
 
 metkaStart
@@ -252,9 +252,13 @@ Oriaxes  : 'oriaxes'|'ORIAXES';
 Traori   : 'traori'|'TRAORI';
 Turn     : 'turn'|'TURN';
 Msg      : 'msg'|'MSG';
+Setal    : 'setal'|'SETAL';
 Sblof    : 'sblof'|'SBLOF';
+Sblon    : 'sblon'|'SBLON';
 Save     : 'save'|'SAVE';
 Displof  : 'displof'|'DISPLOF';
+Displon  : 'displon'|'DISPLON';
+Stopre   : 'stopre'|'STOPRE';
 To       : 'to'|'TO';
 End      : 'end';
 SubProg  : ('l'|'L')('0'..'9')+;
@@ -303,7 +307,7 @@ OBracket : '[';
 CBracket : ']';
 OParen   : '(';
 CParen   : ')';
-SColon   : ';';
+//SColon   : ';';
 Assign   : '=';
 Comma    : ',';
 QMark    : '?';
@@ -343,8 +347,9 @@ String
 
 
 Comment
- : ( ';' .*? (CR|EOF) ) -> skip
- ;
+// : ( ';' .*? (CR|EOF) ) -> skip
+: [;] (~[\r\n])* -> skip
+;
 
 //Space
 // : [ \t\r\n\u000C] -> skip

@@ -18,6 +18,12 @@ public  class ParsedCmdGroup {
     public readonly Double ValueAxis2;
     public readonly Double ValueAxis3;
     public readonly String asRead;  // example: G00 or F100.00
+    
+    public ParsedCmdGroup(String CmdName, String asRead)
+    {
+    	this.CmdName = CmdName;
+    	this.asRead = asRead; 
+    }
 
     public ParsedCmdGroup(String CmdName, String AxisName1, Double ValueAxis1, String parsed1, String asRead) {
         this.CmdName = CmdName;

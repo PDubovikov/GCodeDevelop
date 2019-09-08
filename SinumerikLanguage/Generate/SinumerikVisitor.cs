@@ -62,6 +62,13 @@ public interface ISinumerikVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitVardefinition([NotNull] SinumerikParser.VardefinitionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>IdentifierSubprogCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.subProgCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdentifierSubprogCall([NotNull] SinumerikParser.IdentifierSubprogCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>identifierFunctionCall</c>
 	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
 	/// </summary>
@@ -173,6 +180,48 @@ public interface ISinumerikVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitModeicFunctionCall([NotNull] SinumerikParser.ModeicFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>xaxisNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitXaxisNameFunctionCall([NotNull] SinumerikParser.XaxisNameFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>yaxisNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitYaxisNameFunctionCall([NotNull] SinumerikParser.YaxisNameFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>zaxisNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitZaxisNameFunctionCall([NotNull] SinumerikParser.ZaxisNameFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>aaxisNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAaxisNameFunctionCall([NotNull] SinumerikParser.AaxisNameFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>baxisNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBaxisNameFunctionCall([NotNull] SinumerikParser.BaxisNameFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>caxisNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCaxisNameFunctionCall([NotNull] SinumerikParser.CaxisNameFunctionCallContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>transFunctionCall</c>
 	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
@@ -300,6 +349,13 @@ public interface ISinumerikVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSblonFunctionCall([NotNull] SinumerikParser.SblonFunctionCallContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>saveFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSaveFunctionCall([NotNull] SinumerikParser.SaveFunctionCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>xcoordFunctionCall</c>
 	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
 	/// </summary>
@@ -398,6 +454,13 @@ public interface ISinumerikVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitTurnFunctionCall([NotNull] SinumerikParser.TurnFunctionCallContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>rplFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRplFunctionCall([NotNull] SinumerikParser.RplFunctionCallContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>mmodeFunctionCall</c>
 	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
 	/// </summary>
@@ -440,19 +503,33 @@ public interface ISinumerikVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitToolIDFunctionCall([NotNull] SinumerikParser.ToolIDFunctionCallContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>subprogramFunctionCall</c>
-	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitSubprogramFunctionCall([NotNull] SinumerikParser.SubprogramFunctionCallContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>msgFunctionCall</c>
 	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitMsgFunctionCall([NotNull] SinumerikParser.MsgFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>setalFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSetalFunctionCall([NotNull] SinumerikParser.SetalFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>stopreFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitStopreFunctionCall([NotNull] SinumerikParser.StopreFunctionCallContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>axisByNameFunctionCall</c>
+	/// labeled alternative in <see cref="SinumerikParser.functionCall"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitAxisByNameFunctionCall([NotNull] SinumerikParser.AxisByNameFunctionCallContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SinumerikParser.ifStatement"/>.
 	/// </summary>
@@ -496,17 +573,41 @@ public interface ISinumerikVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitWhileStatement([NotNull] SinumerikParser.WhileStatementContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="SinumerikParser.mcallStatement"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMcallStatement([NotNull] SinumerikParser.McallStatementContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="SinumerikParser.gotoStatement"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitGotoStatement([NotNull] SinumerikParser.GotoStatementContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="SinumerikParser.repeatStatement"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitRepeatStatement([NotNull] SinumerikParser.RepeatStatementContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SinumerikParser.caseStatement"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCaseStatement([NotNull] SinumerikParser.CaseStatementContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="SinumerikParser.returnStatement"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitReturnStatement([NotNull] SinumerikParser.ReturnStatementContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="SinumerikParser.endprogStatement"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEndprogStatement([NotNull] SinumerikParser.EndprogStatementContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="SinumerikParser.idList"/>.
 	/// </summary>

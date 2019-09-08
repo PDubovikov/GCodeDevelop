@@ -14,7 +14,8 @@ namespace SinumerikLanguage.Antlr4
 
         public static readonly SLValue NULL = new SLValue();
         public static readonly SLValue VOID = new SLValue();
-        NumberFormatInfo decimalProvider = new NumberFormatInfo();
+        private NumberFormatInfo numberInfo ;
+        
 
         private Object value;
 
@@ -26,7 +27,8 @@ namespace SinumerikLanguage.Antlr4
 
         public SLValue(Object v)
         {
-            decimalProvider.NumberDecimalDigits = 6;
+            numberInfo = new NumberFormatInfo();
+            numberInfo.NumberDecimalSeparator = ".";
 
             if (v == null)
             {
@@ -40,19 +42,20 @@ namespace SinumerikLanguage.Antlr4
             }
         }
 
+
         public bool asBoolean()
         {
-            return (Boolean)value;
+            return Convert.ToBoolean(value);
         }
 
         public double asDouble()
         {
-            return Convert.ToDouble(value);
+            return Double.Parse(value.ToString(), NumberStyles.AllowDecimalPoint|NumberStyles.AllowLeadingSign|NumberStyles.AllowExponent, CultureInfo.CurrentCulture);
         }
 
         public decimal asDecimal()
         {
-            return Convert.ToDecimal(value, decimalProvider);
+            return Decimal.Parse(value.ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowExponent, CultureInfo.CurrentCulture);
         }
 
         public long asLong()
@@ -68,7 +71,7 @@ namespace SinumerikLanguage.Antlr4
 
         public String asString()
         {
-            return (String)value;
+            return value.ToString();
         }
 
         public int CompareTo(SLValue that)

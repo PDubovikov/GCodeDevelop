@@ -71,7 +71,6 @@ namespace GCD.Model
 				
 				if(latheMode)
 				{
-					
 					_ufsession.Oper.Create("turning", "LATHE_CONTROL", out templateOperTag) ;
 					_ufsession.Oper.AskNameFromTag(templateOperTag, out operName) ;
 					_ufsession.Obj.SetName(templateOperTag, "LATHE_USER_OP") ;

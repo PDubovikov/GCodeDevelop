@@ -250,6 +250,25 @@ namespace gcodeparser
 		{
 
 				return machineStatus.MachineCoordinatesVars[MachineStatus.NonModalsVars.TURN].Value;
+		}
+
+		public double getANG()
+		{
+
+				return machineStatus.MachineCoordinatesVars[MachineStatus.NonModalsVars.ANG].Value;
+		}
+
+		public double getRND()
+		{
+
+				return machineStatus.RndCashVars[MachineStatus.NonModalsVars.RND].Value;
+		}
+		
+
+		public double getCHR()
+		{
+
+				return machineStatus.MachineCoordinatesVars[MachineStatus.NonModalsVars.CHR].Value;
 		}		
 
 		public String getMotionMode()
@@ -304,6 +323,8 @@ namespace gcodeparser
 	//			return getModalValue<Enum>(typeof(ActivePlane.ActPlane));
 			return getModalValue(typeof(ActivePlane.ActPlane).GetEnumNames());
 		}
+		
+		
 		
 		
 	}

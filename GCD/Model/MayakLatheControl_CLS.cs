@@ -62,7 +62,7 @@ namespace GCD.Model
 					}
 									
 					base.StartNXPathSettings(currentBlock) ;
-					base.LinearMotion(motionMode, toolAx, false);
+					base.LinearMotion(motionMode, MachiningPlane, currentBlock, machineStatus, toolAx, false);
 					CircularMotion(machineStatus, currentBlock, motionMode, MachiningPlane, false) ;
 																		
 					base.EndNXPathSettings(currentBlock) ;

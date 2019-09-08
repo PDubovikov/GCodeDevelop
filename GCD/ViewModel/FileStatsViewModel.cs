@@ -22,7 +22,7 @@ namespace GCD.ViewModel
       bi.UriSource = new Uri("pack://application:,,/Images/property-blue.png");
       bi.EndInit();
       IconSource = bi;
-      IsDocActive = false ;   
+      IsDocActive = false ;
       
     }
 	

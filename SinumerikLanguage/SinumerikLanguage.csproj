@@ -53,6 +53,7 @@
     <Compile Include="Antlr4\EvalExceptions.cs" />
     <Compile Include="Antlr4\EvalVisitor.cs" />
     <Compile Include="Antlr4\Function.cs" />
+    <Compile Include="Antlr4\GlobalVarsVisitor.cs" />
     <Compile Include="Antlr4\ReturnValue.cs" />
     <Compile Include="Antlr4\Scope.cs" />
     <Compile Include="Antlr4\SymbolVisitor.cs" />
@@ -73,9 +74,23 @@
     <None Include="App.config" />
     <None Include="Main\Main.ini" />
     <None Include="packages.config" />
+    <None Include="Sub\BAR_CENTR.SPF" />
+    <None Include="Sub\BAR_RAD.SPF" />
     <None Include="Sub\CHAMFER.spf" />
+    <None Include="Sub\CYCLE801.SPF" />
+    <None Include="Sub\CYCLE81.SPF" />
+    <None Include="Sub\CYCLE82.SPF" />
+    <None Include="Sub\CYCLE83.SPF" />
+    <None Include="Sub\CYCLE84.SPF" />
+    <None Include="Sub\CYCLE_KONUS.SPF" />
+    <None Include="Sub\HOLES1.SPF" />
+    <None Include="Sub\HOLES2.SPF" />
     <None Include="Sub\KANAVKA_SFERA.spf" />
     <None Include="Sub\KONUS.spf" />
+    <None Include="Sub\L106.spf" />
+    <None Include="Sub\L140.spf" />
+    <None Include="Sub\L142.spf" />
+    <None Include="Sub\L143.spf" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

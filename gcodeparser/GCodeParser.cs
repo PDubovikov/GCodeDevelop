@@ -22,6 +22,8 @@ namespace gcodeparser
 		private readonly Regex COMMENTS2 = new Regex("\\;.*", RegexOptions.Compiled); // comment after ;
 		private readonly Regex G04 = new Regex("G[0]?[4]\\s*[aA-zZ]?") ;
 		private readonly Regex WORD = new Regex("(DIAMON|DIAMOF|DIAM90)", RegexOptions.Compiled) ;
+		private static readonly string msgpattern = @"([M][S][G]\(.*\))" ;
+		private readonly Regex MSG = new Regex(msgpattern, RegexOptions.Compiled) ;
 //		private readonly Regex COMAND = new Regex(@"([A-Z]{3,})\s*([A-Z])?\s*([-+]?\d*\.?\d*)?\s*([A-Z])?\s*([-+]?\d*\.?\d*)?\s*([A-Z])?\s*([-+]?\d*\.?\d*)?(?=\s|[;])", RegexOptions.Compiled);
 //		private readonly Regex COMAND = new Regex(@"(TRANS|ATRANS|ROT|AROT)(?=\s|[;])", RegexOptions.Compiled);
 //		private DecimalFormat wordFormatter = new DecimalFormat("#.#########"); // Formatting and trimming of numbers
@@ -73,6 +75,7 @@ namespace gcodeparser
 				Match g4 = G04.Match(parsedLine.ToString()) ;
 				Match comment1 = COMMENTS1.Match(parsedLine.ToString()) ;
 				Match comment2 = COMMENTS2.Match(parsedLine.ToString()) ;
+				
 				if (g4.Success)
 				{
 //					currentLine.Replace(g4.Value, "") ;						
@@ -175,7 +178,6 @@ namespace gcodeparser
 
 			}
 			
-
 			// First verify if the block itself is valid before we process it
 			if (machineValidator != null)
 			{
@@ -255,6 +257,12 @@ namespace gcodeparser
 		public virtual ParsedWord findWordInBlock(StringBuilder gcodeBlock)
 		{
 			Match GcodeMatcher = Gcodepattern.Match(gcodeBlock.ToString());
+			Match msg = MSG.Match(gcodeBlock.ToString());
+			
+			if(msg.Success)
+			{
+				return new ParsedWord(msg.Groups[1].ToString(), "", "", double.NaN, msg.Groups[0].ToString()) ;
+			}
 			
 			while (GcodeMatcher.Success)
 			{

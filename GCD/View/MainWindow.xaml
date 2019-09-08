@@ -243,6 +243,14 @@
 				</ScrollViewer>
       	  	</DataTemplate>
           </pane:PanesTemplateSelector.NXToolsViewTemplate>
+      	  <pane:PanesTemplateSelector.ErrorsViewTemplate>
+            <DataTemplate>
+                <avalonEdit:TextEditor Document="{Binding ErrorsOutputDocument, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" FontFamily="Courier New" FontSize="14"
+	              					   IsEnabled="{Binding IsDocActive, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" 
+                					   Focusable="true"
+            						     />
+            </DataTemplate>
+          </pane:PanesTemplateSelector.ErrorsViewTemplate>
         </pane:PanesTemplateSelector>
       </avalonDock:DockingManager.LayoutItemTemplateSelector>
 

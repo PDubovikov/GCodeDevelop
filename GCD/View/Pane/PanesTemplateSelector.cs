@@ -34,6 +34,12 @@ namespace GCD.View.Pane
             get;
             set;
         }
+        
+        public DataTemplate ErrorsViewTemplate
+        {
+            get;
+            set;
+        }
 
         public override System.Windows.DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
         {
@@ -47,6 +53,9 @@ namespace GCD.View.Pane
             
             if (item is NXToolsViewModel)
                 return NXToolsViewTemplate;
+            
+            if (item is ErrorsViewModel)
+                return ErrorsViewTemplate;
 
             return base.SelectTemplate(item, container);
         }
